@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+from datetime import datetime
 
 # =========================
 # PAGE CONFIG
@@ -22,7 +23,7 @@ if "history" not in st.session_state:
 lang = st.selectbox("🌍 Language", ["Български", "English"])
 
 # =========================
-# STYLE
+# STYLE (clean + centered)
 # =========================
 st.markdown("""
 <style>
@@ -33,33 +34,25 @@ st.markdown("""
     radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
     radial-gradient(circle at bottom, rgba(168,85,247,0.12), transparent 30%),
     #020617;
-
     color: #e2e8f0;
 }
 
-/* INPUT CENTER */
-.stTextInput {
+.stTextInput, .stButton {
     display: flex;
     justify-content: center;
 }
 
 .stTextInput input {
     width: 100%;
-    max-width: 500px;
-    height: 60px;
+    max-width: 520px;
+    height: 62px;
     border-radius: 16px;
     font-size: 18px;
 }
 
-/* BUTTON CENTER */
-.stButton {
-    display: flex;
-    justify-content: center;
-}
-
 .stButton button {
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
     height: 48px;
     border-radius: 14px;
     background: linear-gradient(90deg,#2563eb,#7c3aed);
@@ -67,7 +60,6 @@ st.markdown("""
     border: none;
 }
 
-/* CENTER TEXT */
 h1, h3, p {
     text-align: center;
 }
@@ -76,87 +68,91 @@ h1, h3, p {
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (LANGUAGE AWARE)
+# HEADER
 # =========================
-if lang == "Български":
-    st.title("Inner Compass 🏛️")
-    st.markdown("### H-TECH · DIGITAL SYSTEMS")
-    st.markdown("> Продължаваме заедно... по-смирени, по-смислени, по-стоически.")
-    question = "Как се чувстваш?"
-    button = "Изпрати"
-else:
-    st.title("Inner Compass 🏛️")
-    st.markdown("### H-TECH · DIGITAL SYSTEMS")
-    st.markdown("> We continue together... more humble, more meaningful, more stoic.")
-    question = "How do you feel?"
-    button = "Send"
+st.title("Inner Compass 🏛️")
+
+st.markdown("### H-TECH · DIGITAL SYSTEMS")
+
+st.markdown(
+    "> Продължаваме заедно... по-смирени, по-смислени, по-стоически."
+)
 
 st.markdown("---")
 
 # =========================
-# STOIC RESPONSES
+# STOIC ENGINE (SMART)
 # =========================
-responses_bg = [
-    ("💭 Това ще премине.", "Не страдаме от събитията, а от интерпретацията им.", "Епиктет"),
-    ("💭 Спокойствието е сила.", "Контролирай това, което зависи от теб.", "Марк Аврелий"),
-    ("💭 Почивката е прогрес.", "Понякога спирането е напредък.", "Сенека"),
-    ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм")
-]
-
-responses_en = [
-    ("💭 This will pass.", "We suffer not from events, but from our interpretation of them.", "Epictetus"),
-    ("💭 Calm is strength.", "Control what is within your power.", "Marcus Aurelius"),
-    ("💭 Rest is progress.", "Sometimes stopping is moving forward.", "Seneca"),
-    ("💭 Be present.", "Life happens in the present moment.", "Stoicism")
-]
-
-def get_response(text):
+def smart_response(text):
 
     t = text.lower()
 
-    pool = responses_bg if lang == "Български" else responses_en
-
     if any(x in t for x in ["sad", "тъж"]):
-        return pool[0]
+        return (
+            "💭 Изглежда тежък момент. Това чувство е временно.",
+            "Не страдаме от събитията, а от нашата интерпретация.",
+            "Епиктет"
+        )
 
-    if any(x in t for x in ["stress", "стрес"]):
-        return pool[1]
+    if any(x in t for x in ["stress", "стрес", "panic"]):
+        return (
+            "💭 Спри за момент. Дишай.",
+            "Контролирай това, което зависи от теб.",
+            "Марк Аврелий"
+        )
 
-    if any(x in t for x in ["tired", "умор"]):
-        return pool[2]
+    if any(x in t for x in ["tired", "умор", "burnout"]):
+        return (
+            "💭 Тялото ти иска пауза.",
+            "Почивката също е част от движението напред.",
+            "Сенека"
+        )
 
-    return random.choice(pool)
+    return random.choice([
+        ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм"),
+        ("💭 Спокойствието е сила.", "Ясният ум вижда правилно.", "Марк Аврелий")
+    ])
 
 # =========================
-# INPUT (ENTER WORKS)
+# INPUT (ENTER ENABLED)
 # =========================
 with st.form("form", clear_on_submit=True):
 
+    question = "Как се чувстваш?" if lang == "Български" else "How do you feel?"
+
     user_input = st.text_input(question)
 
-    submitted = st.form_submit_button(button)
+    send = st.form_submit_button("Изпрати" if lang == "Български" else "Send")
 
-    if submitted and user_input:
+    if send and user_input:
 
-        r, q, a = get_response(user_input)
+        reflection, quote, author = smart_response(user_input)
 
         st.session_state.history.append({
+            "time": datetime.now().strftime("%H:%M"),
             "user": user_input,
-            "r": r,
-            "q": q,
-            "a": a
+            "r": reflection,
+            "q": quote,
+            "a": author
         })
+
+# =========================
+# DAILY MIND HISTORY (NEW FEATURE)
+# =========================
+if st.session_state.history:
+
+    st.markdown("## 🧠 Дневна емоционална история" if lang == "Български" else "## 🧠 Daily Emotional Log")
 
 # =========================
 # OUTPUT
 # =========================
 for item in reversed(st.session_state.history):
 
-    st.markdown(f"**🧠 {item['user']}**")
+    st.markdown(f"**{item['time']} · 🧠 {item['user']}**")
 
     st.info(item["r"])
 
-    st.markdown(f"💭 {item['q']}")
+    st.markdown(f"💭 *{item['q']}*")
 
     st.caption(f"— {item['a']}")
 
