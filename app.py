@@ -11,21 +11,17 @@ st.set_page_config(
 )
 
 # =======================
-# STATE INIT (for auto-clear input)
+# SESSION STATE
 # =======================
 if "history" not in st.session_state:
     st.session_state.history = []
-
-if "input_key" not in st.session_state:
-    st.session_state.input_key = 0
 
 # =======================
 # LANGUAGE
 # =======================
 lang = st.selectbox(
-    "🌍",
-    ["Български", "English"],
-    label_visibility="collapsed"
+    "🌍 Language",
+    ["Български", "English"]
 )
 
 # =======================
@@ -45,47 +41,57 @@ st.markdown(
     h1 {
         text-align: center;
         color: #f8fafc;
-        margin-bottom: 5px;
+        margin-bottom: 0px;
     }
 
     .subtitle {
         text-align: center;
         color: #94a3b8;
-        font-size: 12px;
         margin-bottom: 20px;
+        font-size: 13px;
         letter-spacing: 1px;
     }
 
-    /* BIGGER INPUT */
+    div[data-baseweb="select"] {
+        max-width: 140px;
+        margin: auto;
+        margin-bottom: 15px;
+        font-size: 12px;
+    }
+
     .stTextInput input {
-        height: 55px;
+        height: 58px;
         font-size: 18px;
         border-radius: 14px;
         background-color: #1e293b;
         color: white;
-        border: 1px solid rgba(255,255,255,0.12);
-    }
-
-    /* SMALLER SELECTBOX */
-    div[data-baseweb="select"] {
-        font-size: 12px;
-        max-width: 120px;
-        margin: 0 auto 10px auto;
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
     .card {
-        margin-top: 12px;
+        margin-top: 10px;
         padding: 18px;
         border-radius: 16px;
         background: rgba(17, 24, 39, 0.65);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255,255,255,0.08);
-        line-height: 1.6;
+        line-height: 1.7;
     }
 
     .user {
         color: #60a5fa;
-        margin-top: 10px;
+        margin-top: 18px;
+        font-weight: 500;
+    }
+
+    .stButton button {
+        width: 100%;
+        border-radius: 12px;
+        height: 45px;
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        font-size: 16px;
     }
     </style>
     """,
@@ -97,65 +103,88 @@ st.markdown(
 # =======================
 st.markdown("<h1>Inner Compass 🏛️</h1>", unsafe_allow_html=True)
 
-subtitle = "calm stoic reflection engine"
-if lang == "English":
-    subtitle = "calm stoic reflection engine"
+subtitle = "◉ calm stoic reflection engine ◉"
 
-st.markdown(f"<div class='subtitle'>◉ {subtitle} ◉</div>", unsafe_allow_html=True)
+st.markdown(
+    f"<div class='subtitle'>{subtitle}</div>",
+    unsafe_allow_html=True
+)
 
 # =======================
-# SMART ENGINE (more natural variation)
+# SMART ENGINE
 # =======================
 def inner_compass(text):
     t = text.lower()
 
-    if any(w in t for w in ["тъжен","sad","lonely","болка","pain"]):
+    # sadness
+    if any(w in t for w in ["тъжен", "sad", "сам", "lonely", "болка", "pain"]):
         return random.choice([
             "💭 Това е временно.\n🏛️ Епиктет: Не събитията, а възприятието ни за тях.",
-            "💭 Разбирам те.\n🏛️ Това ще премине.",
-            "💭 Болката не е постоянна.\n🏛️ Всичко се движи."
+            "💭 Разбирам те.\n🏛️ Всичко се променя.",
+            "💭 Болката не е постоянна.\n🏛️ И това ще премине."
         ])
 
-    if any(w in t for w in ["стрес","stress","anxiety","паника"]):
+    # stress
+    if any(w in t for w in ["стрес", "stress", "anxiety", "паника"]):
         return random.choice([
             "💭 Върни се към настоящия момент.\n🏛️ Контролирай това, което можеш.",
-            "💭 Умът ти е натоварен.\n🏛️ Спокойствието е избор.",
-            "💭 Една стъпка е достатъчна.\n🏛️ Не всичко е спешно."
+            "💭 Не всичко трябва да бъде решено днес.\n🏛️ Спокойствието е сила.",
+            "💭 Една малка стъпка е достатъчна.\n🏛️ Дишай по-бавно."
         ])
 
-    if any(w in t for w in ["изморен","tired","exhausted"]):
+    # fatigue
+    if any(w in t for w in ["изморен", "изморена", "tired", "exhausted"]):
         return random.choice([
-            "💭 Почивката е сила.\n🏛️ Сенека: Дори силният ум има нужда от покой.",
-            "💭 Тялото ти има нужда от пауза.\n🏛️ Това е нормално.",
-            "💭 Забави темпото.\n🏛️ Възстановяването е прогрес."
+            "💭 Почивката е част от напредъка.\n🏛️ Дори силният ум има нужда от покой.",
+            "💭 Тялото ти сигнализира.\n🏛️ Слушай го.",
+            "💭 Забави темпото.\n🏛️ Възстановяването е сила."
         ])
 
-    return "💭 Разбирам.\n🏛️ Наблюдавай това чувство спокойно."
+    # anger
+    if any(w in t for w in ["ядосан", "angry", "гняв"]):
+        return random.choice([
+            "💭 Емоцията е временна.\n🏛️ Реакцията е избор.",
+            "💭 Спокойствието е контрол.\n🏛️ Не позволявай на момента да те управлява.",
+            "💭 Направи пауза.\n🏛️ Ясният ум вижда по-добре."
+        ])
+
+    # default
+    if lang == "English":
+        return "💭 I hear you.\n🏛️ Observe the feeling without judgment."
+    else:
+        return "💭 Разбирам.\n🏛️ Наблюдавай чувството спокойно."
 
 # =======================
-# INPUT
+# FORM (REAL FIX FOR CLEAR INPUT)
 # =======================
-placeholder = "Как се чувстваш?" if lang == "Български" else "How do you feel?"
+with st.form("feeling_form", clear_on_submit=True):
 
-user = st.text_input(
-    placeholder,
-    key=f"input_{st.session_state.input_key}",
-    label_visibility="collapsed"
-)
+    question = "Как се чувстваш?"
+    button_text = "Изпрати"
 
-# =======================
-# SUBMIT LOGIC
-# =======================
-if user:
-    response = inner_compass(user)
-    st.session_state.history.append((user, response))
+    if lang == "English":
+        question = "How do you feel?"
+        button_text = "Send"
 
-    # 🔥 RESET INPUT (key trick)
-    st.session_state.input_key += 1
+    user_input = st.text_input(question)
+
+    submitted = st.form_submit_button(button_text)
+
+    if submitted and user_input:
+        response = inner_compass(user_input)
+        st.session_state.history.append((user_input, response))
 
 # =======================
 # DISPLAY HISTORY
 # =======================
 for u, r in reversed(st.session_state.history):
-    st.markdown(f"<div class='user'>🧠 {u}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='card'>{r.replace('\n','<br>')}</div>", unsafe_allow_html=True)
+
+    st.markdown(
+        f"<div class='user'>🧠 {u}</div>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        f"<div class='card'>{r.replace(chr(10), '<br>')}</div>",
+        unsafe_allow_html=True
+    )
