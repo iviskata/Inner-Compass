@@ -27,6 +27,7 @@ lang = st.selectbox("🌍 Language", ["Български", "English"])
 # =========================
 st.markdown("""
 <style>
+
 .stApp {
     text-align: center;
     background:
@@ -62,6 +63,7 @@ st.markdown("""
 h1, h3, p {
     text-align: center;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -74,7 +76,7 @@ st.markdown("> Продължаваме заедно... по-смирени, п�
 st.markdown("---")
 
 # =========================
-# RESPONSES
+# STOIC RESPONSES
 # =========================
 responses = [
     ("💭 Това ще премине.", "Не страдаме от събитията, а от интерпретацията им.", "Епиктет"),
@@ -93,7 +95,7 @@ def get_response(text):
         return responses[0]
     if "умор" in t or "tired" in t:
         return responses[2]
-    if "добре" in t or "happy" in t or "ок" in t:
+    if "добре" in t or "happy" in t or "ok" in t:
         return responses[4]
 
     return random.choice(responses)
@@ -129,11 +131,11 @@ for item in reversed(st.session_state.history):
     st.markdown("---")
 
 # =========================
-# SUMMARY (BOTTOM)
+# DAILY SUMMARY (BOTTOM)
 # =========================
 st.markdown("## 📊 End of Day Reflection")
 
-if len(st.session_state.history) > 0:
+if st.session_state.history:
 
     texts = [h["text"].lower() for h in st.session_state.history]
 
@@ -150,33 +152,48 @@ if len(st.session_state.history) > 0:
     st.markdown("---")
 
     if positive >= max(stress, sad, tired):
-        st.success("💭 Балансиран и добър ден.")
-        st.caption("— Стоицизъм")
-
+        st.success("💭 Балансиран и позитивен ден.")
     elif stress > sad and stress > tired:
-        st.info("💭 Напрегнат ден. Помни: контролирай реакцията си.")
-        st.caption("— Марк Аврелий")
-
+        st.info("💭 Напрегнат ден — контролирай реакцията.")
     elif tired > stress:
-        st.info("💭 Умората показва нужда от почивка.")
-        st.caption("— Сенека")
-
+        st.info("💭 Умора — време за почивка.")
     else:
         st.info("💭 Балансиран ден.")
-        st.caption("— Стоицизъм")
 
 # =========================
-# WELLBEING GUIDE
+# WELL-BEING DASHBOARD (TWO COLUMNS)
 # =========================
 st.markdown("---")
-st.markdown("## 🧠 Well-being Guide for Developers")
+st.markdown("## 🧠 Developer Well-being Dashboard")
 
-st.markdown("""
-💻 **Deep Work:** 60–90 мин фокус без прекъсване  
-👁️ **20-20-20:** почивка за очите  
-🚶 **Movement breaks:** ставане на всеки час  
-💧 **Хидратация:** вода за мозъка  
-🧘 **Дишане:** 1–2 мин при стрес  
-🎯 **Single-tasking:** една задача наведнъж  
-🌙 **Shutdown:** затваряне на деня спокойно
-""")
+left, right = st.columns(2)
+
+with left:
+    st.markdown("### 🎯 Focus & Productivity")
+
+    with st.expander("💻 Deep Work"):
+        st.write("60–90 мин фокус без прекъсване върху една задача.")
+
+    with st.expander("🎯 Single-tasking"):
+        st.write("Една задача наведнъж = по-висока продуктивност.")
+
+    with st.expander("📵 Digital silence"):
+        st.write("Изключи нотификации по време на фокус.")
+
+    with st.expander("🧠 Planning"):
+        st.write("Започни деня с 3 ясни приоритета.")
+
+with right:
+    st.markdown("### 🧘 Health & Recovery")
+
+    with st.expander("👁️ 20-20-20 rule"):
+        st.write("На всеки 20 мин гледай 20 сек в далечината.")
+
+    with st.expander("🚶 Movement breaks"):
+        st.write("Ставай на всеки час и се движи.")
+
+    with st.expander("💧 Hydration"):
+        st.write("Водата влияе директно на концентрацията.")
+
+    with st.expander("🌙 Shutdown ritual"):
+        st.write("Затвори деня осъзнато и без работа след това.")
