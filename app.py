@@ -1,24 +1,18 @@
 import streamlit as st
-<div style="
-    margin-top:20px;
-    padding:22px;
-    border-radius:18px;
-    background: rgba(17, 24, 39, 0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.08);
-    color:#e2e8f0;
-    line-height:1.6;
-">
-# ===== PAGE SETTINGS =====
+
+# ===== PAGE CONFIG =====
 st.set_page_config(page_title="Inner Compass", page_icon="🏛️")
 
-# ===== CUSTOM STYLE =====
+# ===== DARK CALM BACKGROUND =====
 st.markdown(
     """
     <style>
-    .main {
-        background-color: #0f172a;
-        color: #e2e8f0;
+    .stApp {
+        background: radial-gradient(circle at top, #0f172a, #020617);
+    }
+
+    .block-container {
+        padding-top: 2rem;
     }
 
     h1 {
@@ -33,38 +27,25 @@ st.markdown(
         border-radius: 10px;
         padding: 10px;
     }
-
-    .card {
-        background-color: #111827;
-        padding: 20px;
-        border-radius: 16px;
-        margin-top: 20px;
-        box-shadow: 0px 4px 20px rgba(0,0,0,0.4);
-        color: #e2e8f0;
-        line-height: 1.6;
-    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# ===== STOIC LOGIC =====
+# ===== STOIC CORE =====
 def inner_compass(text):
     text = text.lower()
 
     if any(w in text for w in ["тъжен", "сам", "болка", "празно", "отчаян"]):
-        return "💭 Разбирам те. Това, което чувстваш, е тежко.\n\n🧭 Това състояние няма да остане вечно.\n\n🏛️ „Не ни тревожат нещата, а нашето мнение за тях.“ – Епиктет"
+        return "💭 Разбирам те. Това, което чувстваш, е тежко.\n\n🧭 Това няма да остане вечно.\n\n🏛️ „Не ни тревожат нещата, а нашето мнение за тях.“ – Епиктет"
 
     if any(w in text for w in ["изморен", "изморена", "нямам сили", "изтощен"]):
-        return "💭 Чувстваш се изтощен — това е сигнал, не слабост.\n\n🧭 Почивката е част от напредъка.\n\n🏛️ „Трудностите укрепват ума.“ – Сенека"
+        return "💭 Тялото ти има нужда от почивка.\n\n🧭 Това не е слабост, а сигнал.\n\n🏛️ „Трудностите укрепват ума.“ – Сенека"
 
     if any(w in text for w in ["стрес", "претоварен", "напрежение"]):
-        return "💭 В момента носиш твърде много.\n\n🧭 Сведи мисълта до една следваща стъпка.\n\n🏛️ „Фокусирай се само върху това, което зависи от теб.“ – Епиктет"
+        return "💭 Носи се твърде много наведнъж.\n\n🧭 Само следващата стъпка има значение.\n\n🏛️ „Фокусирай се върху това, което зависи от теб.“ – Епиктет"
 
-    if any(w in text for w in ["ядосан", "нарани", "хора"]):
-        return "💭 Разбирам реакцията ти.\n\n🧭 Спокойствието ти зависи от теб, не от другите.\n\n🏛️ „Избери да не бъдеш наранен от действията на другите.“ – Марк Аврелий"
-
-    return "💭 Добре е, че споделяш това.\n\n🧭 Опитай да погледнеш ситуацията по-спокойно.\n\n🏛️ „Животът е такъв, какъвто го правят мислите ни.“ – Марк Аврелий"
+    return "💭 Добре е, че споделяш това.\n\n🧭 Погледни ситуацията по-спокойно.\n\n🏛️ „Животът е такъв, какъвто го правят мислите ни.“ – Марк Аврелий"
 
 
 # ===== UI =====
@@ -77,7 +58,16 @@ if user:
 
     st.markdown(
         f"""
-        <div class="card">
+        <div style="
+            margin-top:20px;
+            padding:22px;
+            border-radius:18px;
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            color:#e2e8f0;
+            line-height:1.6;
+        ">
         {response.replace('\n', '<br>')}
         </div>
         """,
