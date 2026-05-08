@@ -11,7 +11,7 @@ st.set_page_config(
 )
 
 # =================================
-# MEMORY
+# SESSION
 # =================================
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -40,8 +40,8 @@ html, body, [class*="css"] {
 /* TITLE */
 h1 {
     text-align: center;
-    color: white;
     font-size: 44px;
+    color: white;
     margin-bottom: 0px;
 }
 
@@ -49,16 +49,16 @@ h1 {
 .subtitle {
     text-align: center;
     color: #94a3b8;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     font-size: 13px;
     letter-spacing: 2px;
 }
 
-/* LANGUAGE ICON */
+/* LANGUAGE */
 .lang {
     text-align: center;
-    margin-bottom: -5px;
     font-size: 17px;
+    margin-bottom: -5px;
 }
 
 /* SELECT */
@@ -68,7 +68,7 @@ div[data-baseweb="select"] {
     margin-bottom: 20px;
 }
 
-/* INPUT */
+/* INPUT FIX (CENTER CURSOR + TEXT) */
 .stTextInput input {
     height: 62px;
     border-radius: 16px;
@@ -80,23 +80,22 @@ div[data-baseweb="select"] {
     border: 1px solid rgba(255,255,255,0.08);
 
     padding-left: 18px;
+
+    /* 🔥 FIX */
+    line-height: 62px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 /* BUTTON */
 .stButton button {
     width: 100%;
     height: 50px;
-
     border-radius: 14px;
-    border: none;
 
-    background: linear-gradient(
-        90deg,
-        #2563eb,
-        #7c3aed
-    );
-
+    background: linear-gradient(90deg,#2563eb,#7c3aed);
     color: white;
+    border: none;
     font-size: 16px;
 }
 
@@ -105,27 +104,20 @@ div[data-baseweb="select"] {
     color: #60a5fa;
     margin-top: 25px;
     margin-bottom: 8px;
-    font-weight: 500;
 }
 
 /* CARD */
 .card {
     padding: 20px;
-
     border-radius: 18px;
-
     background: rgba(15,23,42,0.72);
-
     border: 1px solid rgba(255,255,255,0.06);
-
-    line-height: 1.8;
-
-    box-shadow: 0 4px 30px rgba(0,0,0,0.25);
+    line-height: 1.7;
 }
 
 /* QUOTE */
 .quote {
-    margin-top: 15px;
+    margin-top: 12px;
     color: #cbd5e1;
     font-style: italic;
 }
@@ -141,185 +133,94 @@ div[data-baseweb="select"] {
 """, unsafe_allow_html=True)
 
 # =================================
+# HEADER
+# =================================
+st.markdown("<h1>Inner Compass 🏛️</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>◉ calm stoic reflection engine ◉</div>", unsafe_allow_html=True)
+
+# =================================
 # LANGUAGE
 # =================================
 st.markdown("<div class='lang'>🌍</div>", unsafe_allow_html=True)
 
-lang = st.selectbox(
-    "",
-    ["Български", "English"],
-    label_visibility="collapsed"
-)
+lang = st.selectbox("", ["Български", "English"], label_visibility="collapsed")
 
 # =================================
-# HEADER
+# STOIC DATA
 # =================================
-st.markdown(
-    "<h1>Inner Compass 🏛️</h1>",
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    "<div class='subtitle'>◉ calm stoic reflection engine ◉</div>",
-    unsafe_allow_html=True
-)
-
-# =================================
-# DATABASE
-# =================================
-quotes = {
-
+data = {
     "sad": [
-
-        (
-            "💭 Това чувство няма да остане завинаги.",
-            "Не страдаме от събитията, а от представите си за тях.",
-            "Епиктет"
-        ),
-
-        (
-            "💭 Дори тежките дни преминават.",
-            "Душата става по-силна чрез трудностите.",
-            "Сенека"
-        )
+        ("💭 Това ще мине.", "Не страдаме от събитията, а от представите си.", "Епиктет"),
+        ("💭 Тъгата не е вечна.", "Всичко се променя.", "Марк Аврелий")
     ],
-
     "stress": [
-
-        (
-            "💭 Не носи целия свят наведнъж.",
-            "Имаш власт над ума си — не над външните събития.",
-            "Марк Аврелий"
-        ),
-
-        (
-            "💭 Спокойствието е сила.",
-            "Спокойният ум носи яснота.",
-            "Сенека"
-        )
+        ("💭 Спри за момент.", "Имаш контрол само над ума си.", "Марк Аврелий"),
+        ("💭 Дишай.", "Спокойният ум вижда ясно.", "Сенека")
     ],
-
     "tired": [
-
-        (
-            "💭 Възстановяването също е прогрес.",
-            "Природата работи в ритъм.",
-            "Епиктет"
-        ),
-
-        (
-            "💭 Забавянето не означава провал.",
-            "Силният ум знае кога да спре.",
-            "Марк Аврелий"
-        )
+        ("💭 Почивката е сила.", "Понякога спирането е напредък.", "Сенека"),
+        ("💭 Не бързай.", "Природата не бърза.", "Епиктет")
     ]
 }
 
-# =================================
-# DETECT EMOTION
-# =================================
 def detect(text):
-
     t = text.lower()
 
-    if any(x in t for x in [
-        "тъжен","тъжна","sad","сам"
-    ]):
+    if "тъж" in t or "sad" in t:
         return "sad"
-
-    if any(x in t for x in [
-        "стрес","stress","паника"
-    ]):
+    if "стрес" in t or "stress" in t:
         return "stress"
-
-    if any(x in t for x in [
-        "изморен","изморена","tired"
-    ]):
+    if "умор" in t or "tired" in t:
         return "tired"
 
     return "default"
 
-# =================================
-# RESPONSE
-# =================================
-def answer(user_text):
+def respond(text):
 
-    emotion = detect(user_text)
+    e = detect(text)
 
-    if emotion == "default":
+    if e == "default":
 
         if lang == "English":
-            return (
-                "💭 Stay present with the feeling.",
-                "The soul becomes dyed with the color of its thoughts.",
-                "Marcus Aurelius"
-            )
+            return ("💭 Stay present.", "Your mind shapes your world.", "Marcus Aurelius")
 
-        return (
-            "💭 Остани спокоен в настоящия момент.",
-            "Душата приема цвета на мислите си.",
-            "Марк Аврелий"
-        )
+        return ("💭 Бъди тук.", "Мислите оформят реалността.", "Марк Аврелий")
 
-    return random.choice(quotes[emotion])
+    return random.choice(data[e])
 
 # =================================
-# FORM
+# INPUT
 # =================================
 with st.form("form", clear_on_submit=True):
 
-    question = (
-        "Как се чувстваш?"
-        if lang == "Български"
-        else "How do you feel?"
-    )
+    q = "Как се чувстваш?" if lang == "Български" else "How do you feel?"
 
-    button = (
-        "Изпрати"
-        if lang == "Български"
-        else "Send"
-    )
+    text = st.text_input(q)
 
-    user_input = st.text_input(question)
+    send = st.form_submit_button("Изпрати" if lang == "Български" else "Send")
 
-    submit = st.form_submit_button(button)
+    if send and text:
 
-    if submit and user_input:
-
-        reflection, quote, author = answer(user_input)
+        r, c, a = respond(text)
 
         st.session_state.history.append({
-            "user": user_input,
-            "reflection": reflection,
-            "quote": quote,
-            "author": author
+            "user": text,
+            "r": r,
+            "c": c,
+            "a": a
         })
 
 # =================================
-# SHOW HISTORY
+# OUTPUT
 # =================================
 for item in reversed(st.session_state.history):
 
-    st.markdown(
-        f"<div class='user'>🧠 {item['user']}</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown(f"<div class='user'>🧠 {item['user']}</div>", unsafe_allow_html=True)
 
-    st.markdown(
-        f"""
-<div class='card'>
-
-{item['reflection']}
-
-<div class='quote'>
-“{item['quote']}”
-</div>
-
-<div class='author'>
-— {item['author']}
-</div>
-
-</div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+    <div class='card'>
+        {item['r']}
+        <div class='quote'>“{item['c']}”</div>
+        <div class='author'>— {item['a']}</div>
+    </div>
+    """, unsafe_allow_html=True)
