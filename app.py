@@ -11,13 +11,18 @@ st.set_page_config(
 )
 
 # =========================
-# SESSION
+# SESSION STATE
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = []
 
 # =========================
-# STYLE (CENTER FIX)
+# LANGUAGE
+# =========================
+lang = st.selectbox("🌍 Language", ["Български", "English"])
+
+# =========================
+# STYLE
 # =========================
 st.markdown("""
 <style>
@@ -32,7 +37,7 @@ st.markdown("""
     color: #e2e8f0;
 }
 
-/* INPUT CENTER FIX */
+/* INPUT CENTER */
 .stTextInput {
     display: flex;
     justify-content: center;
@@ -62,7 +67,7 @@ st.markdown("""
     border: none;
 }
 
-/* TEXT CENTER */
+/* CENTER TEXT */
 h1, h3, p {
     text-align: center;
 }
@@ -71,54 +76,65 @@ h1, h3, p {
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
+# HEADER (LANGUAGE AWARE)
 # =========================
-st.title("Inner Compass 🏛️")
-
-st.markdown("### H-TECH · DIGITAL SYSTEMS")
-
-st.markdown(
-    "> Продължаваме заедно... по-смирени, по-смислени, по-стоически."
-)
+if lang == "Български":
+    st.title("Inner Compass 🏛️")
+    st.markdown("### H-TECH · DIGITAL SYSTEMS")
+    st.markdown("> Продължаваме заедно... по-смирени, по-смислени, по-стоически.")
+    question = "Как се чувстваш?"
+    button = "Изпрати"
+else:
+    st.title("Inner Compass 🏛️")
+    st.markdown("### H-TECH · DIGITAL SYSTEMS")
+    st.markdown("> We continue together... more humble, more meaningful, more stoic.")
+    question = "How do you feel?"
+    button = "Send"
 
 st.markdown("---")
 
 # =========================
 # STOIC RESPONSES
 # =========================
-responses = [
+responses_bg = [
     ("💭 Това ще премине.", "Не страдаме от събитията, а от интерпретацията им.", "Епиктет"),
     ("💭 Спокойствието е сила.", "Контролирай това, което зависи от теб.", "Марк Аврелий"),
     ("💭 Почивката е прогрес.", "Понякога спирането е напредък.", "Сенека"),
     ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм")
 ]
 
-# =========================
-# ENGINE
-# =========================
+responses_en = [
+    ("💭 This will pass.", "We suffer not from events, but from our interpretation of them.", "Epictetus"),
+    ("💭 Calm is strength.", "Control what is within your power.", "Marcus Aurelius"),
+    ("💭 Rest is progress.", "Sometimes stopping is moving forward.", "Seneca"),
+    ("💭 Be present.", "Life happens in the present moment.", "Stoicism")
+]
+
 def get_response(text):
 
     t = text.lower()
 
-    if "тъж" in t or "sad" in t:
-        return responses[0]
+    pool = responses_bg if lang == "Български" else responses_en
 
-    if "стрес" in t or "stress" in t:
-        return responses[1]
+    if any(x in t for x in ["sad", "тъж"]):
+        return pool[0]
 
-    if "умор" in t or "tired" in t:
-        return responses[2]
+    if any(x in t for x in ["stress", "стрес"]):
+        return pool[1]
 
-    return random.choice(responses)
+    if any(x in t for x in ["tired", "умор"]):
+        return pool[2]
+
+    return random.choice(pool)
 
 # =========================
 # INPUT (ENTER WORKS)
 # =========================
 with st.form("form", clear_on_submit=True):
 
-    user_input = st.text_input("Как се чувстваш?")
+    user_input = st.text_input(question)
 
-    submitted = st.form_submit_button("Изпрати")
+    submitted = st.form_submit_button(button)
 
     if submitted and user_input:
 
