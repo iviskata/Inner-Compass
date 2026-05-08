@@ -1,18 +1,14 @@
 import streamlit as st
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background: radial-gradient(circle at top, #0f172a, #020617);
-    }
-
-    .block-container {
-        padding-top: 2rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+<div style="
+    margin-top:20px;
+    padding:22px;
+    border-radius:18px;
+    background: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    color:#e2e8f0;
+    line-height:1.6;
+">
 # ===== PAGE SETTINGS =====
 st.set_page_config(page_title="Inner Compass", page_icon="🏛️")
 
