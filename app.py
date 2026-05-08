@@ -1,25 +1,28 @@
 import streamlit as st
 import random
 
-# =======================
+# ==================================
 # PAGE CONFIG
-# =======================
+# ==================================
 st.set_page_config(
     page_title="Inner Compass",
     page_icon="🏛️",
     layout="centered"
 )
 
-# =======================
+# ==================================
 # SESSION STATE
-# =======================
+# ==================================
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# =======================
-# LANGUAGE
-# =======================
-st.markdown("<div class='lang-wrap'>🌍</div>", unsafe_allow_html=True)
+# ==================================
+# LANGUAGE SELECTOR
+# ==================================
+st.markdown(
+    "<div style='text-align:center; font-size:18px; margin-bottom:-8px;'>🌍</div>",
+    unsafe_allow_html=True
+)
 
 lang = st.selectbox(
     "",
@@ -27,9 +30,9 @@ lang = st.selectbox(
     label_visibility="collapsed"
 )
 
-# =======================
+# ==================================
 # STYLE
-# =======================
+# ==================================
 st.markdown("""
 <style>
 
@@ -42,12 +45,13 @@ html, body, [class*="css"] {
 .stApp {
     background:
     radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
-    radial-gradient(circle at bottom, rgba(168,85,247,0.12), transparent 30%),
+    radial-gradient(circle at bottom, rgba(168,85,247,0.10), transparent 30%),
     #020617;
+
     color: #e2e8f0;
 }
 
-/* HEADER */
+/* TITLE */
 h1 {
     text-align: center;
     color: #f8fafc;
@@ -56,23 +60,18 @@ h1 {
     letter-spacing: -1px;
 }
 
+/* SUBTITLE */
 .subtitle {
     text-align: center;
     color: #94a3b8;
     margin-bottom: 28px;
+    margin-top: 4px;
     font-size: 13px;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
 
-/* LANGUAGE */
-.lang-wrap {
-    text-align: center;
-    font-size: 18px;
-    margin-bottom: -8px;
-    opacity: 0.85;
-}
-
+/* LANGUAGE BOX */
 div[data-baseweb="select"] {
     max-width: 130px;
     margin: auto;
@@ -84,7 +83,7 @@ div[data-baseweb="select"] {
     height: 62px;
     font-size: 18px;
     border-radius: 16px;
-    background: rgba(15,23,42,0.9);
+    background: rgba(15,23,42,0.90);
     color: white;
     border: 1px solid rgba(255,255,255,0.08);
     padding-left: 18px;
@@ -96,17 +95,20 @@ div[data-baseweb="select"] {
     height: 50px;
     border-radius: 14px;
     border: none;
+
     background: linear-gradient(90deg, #2563eb, #7c3aed);
+
     color: white;
     font-size: 16px;
     font-weight: 500;
+
     margin-top: 6px;
 }
 
-/* USER */
+/* USER MESSAGE */
 .user {
     color: #60a5fa;
-    margin-top: 22px;
+    margin-top: 24px;
     margin-bottom: 8px;
     font-weight: 500;
     font-size: 15px;
@@ -116,15 +118,21 @@ div[data-baseweb="select"] {
 .card {
     padding: 20px;
     border-radius: 18px;
+
     background: rgba(15,23,42,0.72);
+
     backdrop-filter: blur(16px);
+
     border: 1px solid rgba(255,255,255,0.06);
+
     line-height: 1.8;
     color: #e2e8f0;
     font-size: 16px;
+
     box-shadow: 0 4px 30px rgba(0,0,0,0.25);
 }
 
+/* QUOTE */
 .quote {
     margin-top: 14px;
     color: #cbd5e1;
@@ -132,6 +140,7 @@ div[data-baseweb="select"] {
     opacity: 0.92;
 }
 
+/* AUTHOR */
 .author {
     margin-top: 8px;
     color: #94a3b8;
@@ -141,9 +150,9 @@ div[data-baseweb="select"] {
 </style>
 """, unsafe_allow_html=True)
 
-# =======================
+# ==================================
 # HEADER
-# =======================
+# ==================================
 st.markdown("<h1>Inner Compass 🏛️</h1>", unsafe_allow_html=True)
 
 subtitle = "◉ calm stoic reflection engine ◉"
@@ -153,78 +162,86 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# =======================
+# ==================================
 # STOIC DATABASE
-# =======================
-stoic_db = {
+# ==================================
+stoic_quotes = {
 
     "sadness": [
         (
-            "💭 Болката не е вечна. Това, което чувстваш сега, ще се промени.",
+            "💭 Това чувство няма да остане завинаги.",
             "Не страдаме от събитията, а от представите си за тях.",
             "Епиктет"
         ),
+
         (
-            "💭 Тъгата не те определя. Тя е момент, не самоличност.",
+            "💭 Дори трудните моменти преминават.",
             "Душата става по-силна чрез трудностите.",
             "Сенека"
         ),
+
         (
-            "💭 Дори тежките дни преминават.",
-            "Всичко, което се случва, е част от природата.",
+            "💭 Тъгата е момент, не твоята същност.",
+            "Всичко се променя.",
             "Марк Аврелий"
         )
     ],
 
     "stress": [
         (
-            "💭 Върни се към настоящия момент. Не носи целия свят наведнъж.",
+            "💭 Не носи целия свят наведнъж.",
             "Имаш власт над ума си — не над външните събития.",
             "Марк Аврелий"
         ),
+
         (
-            "💭 Не всичко изисква незабавен отговор.",
-            "Спокойният ум носи сила.",
-            "Сенека"
-        ),
-        (
-            "💭 Една малка стъпка е достатъчна за сега.",
+            "💭 Една стъпка е достатъчна за сега.",
             "Контролирай това, което зависи от теб.",
             "Епиктет"
+        ),
+
+        (
+            "💭 Спокойствието е сила.",
+            "Спокойният ум носи най-голяма яснота.",
+            "Сенека"
         )
     ],
 
     "fatigue": [
         (
-            "💭 Тялото ти има нужда от покой, не от вина.",
+            "💭 Тялото ти има нужда от пауза.",
             "Понякога почивката е най-мъдрото действие.",
             "Сенека"
         ),
+
+        (
+            "💭 Възстановяването също е прогрес.",
+            "Природата работи в ритъм.",
+            "Епиктет"
+        ),
+
         (
             "💭 Забавянето не означава провал.",
             "Силният ум знае кога да спре.",
             "Марк Аврелий"
-        ),
-        (
-            "💭 Възстановяването също е прогрес.",
-            "Природата работи в ритъм, не в бързане.",
-            "Епиктет"
         )
     ],
 
     "anger": [
         (
-            "💭 Реакцията ти е по-важна от самата ситуация.",
+            "💭 Реакцията ти е по-важна от ситуацията.",
             "Най-доброто отмъщение е да не приличаш на този, който те е наранил.",
             "Марк Аврелий"
         ),
+
         (
-            "💭 Гневът замъглява ясната мисъл.",
+            "💭 Направи пауза преди действие.",
             "Този, който владее себе си, е истински силен.",
             "Сенека"
         ),
+
         (
-            "💭 Направи пауза преди действие.",
+            "💭 Спокойствието връща ясната мисъл.",
             "Свободата започва с контрол над реакциите.",
             "Епиктет"
         )
@@ -232,60 +249,62 @@ stoic_db = {
 
     "fear": [
         (
-            "💭 Бъдещето не е тук още. Остани в настоящето.",
-            "Често страдаме повече във въображението си, отколкото в реалността.",
+            "💭 Бъдещето още не е дошло.",
+            "Често страдаме повече във въображението си.",
             "Сенека"
         ),
+
         (
-            "💭 Страхът не означава слабост.",
+            "💭 Не позволявай на страха да управлява деня ти.",
             "Пречката по пътя се превръща в самия път.",
             "Марк Аврелий"
         ),
+
         (
-            "💭 Не позволявай на неизвестното да отнеме спокойствието ти.",
-            "Не можеш да контролираш всичко — и това е нормално.",
+            "💭 Не е нужно да контролираш всичко.",
+            "Приеми това, което не зависи от теб.",
             "Епиктет"
         )
     ]
 }
 
-# =======================
-# SMART MATCHING
-# =======================
+# ==================================
+# EMOTION DETECTION
+# ==================================
 def detect_emotion(text):
 
     t = text.lower()
 
     if any(w in t for w in [
-        "тъжен","тъжна","sad","lonely","болка","pain","сам"
+        "тъжен", "тъжна", "sad", "болка", "pain", "сам", "lonely"
     ]):
         return "sadness"
 
     if any(w in t for w in [
-        "стрес","stress","anxiety","паника","overthinking"
+        "стрес", "stress", "паника", "anxiety", "overthinking"
     ]):
         return "stress"
 
     if any(w in t for w in [
-        "изморен","изморена","tired","burnout","exhausted"
+        "изморен", "изморена", "tired", "burnout", "exhausted"
     ]):
         return "fatigue"
 
     if any(w in t for w in [
-        "яд","гняв","angry","anger","ядосан"
+        "яд", "гняв", "angry", "anger", "ядосан"
     ]):
         return "anger"
 
     if any(w in t for w in [
-        "страх","fear","scared","worried","притеснен"
+        "страх", "fear", "worried", "scared", "притеснен"
     ]):
         return "fear"
 
     return "default"
 
-# =======================
+# ==================================
 # RESPONSE ENGINE
-# =======================
+# ==================================
 def inner_compass(user_text):
 
     emotion = detect_emotion(user_text)
@@ -294,22 +313,22 @@ def inner_compass(user_text):
 
         if lang == "English":
             return (
-                "💭 I hear you. Stay present with the feeling.",
+                "💭 Stay present with the feeling.",
                 "The soul becomes dyed with the color of its thoughts.",
                 "Marcus Aurelius"
             )
 
         return (
-            "💭 Разбирам те. Остани спокоен в настоящия момент.",
+            "💭 Остани спокоен в настоящия момент.",
             "Душата приема цвета на мислите си.",
             "Марк Аврелий"
         )
 
-    return random.choice(stoic_db[emotion])
+    return random.choice(stoic_quotes[emotion])
 
-# =======================
+# ==================================
 # FORM
-# =======================
+# ==================================
 with st.form("emotion_form", clear_on_submit=True):
 
     question = (
@@ -318,7 +337,7 @@ with st.form("emotion_form", clear_on_submit=True):
         else "How do you feel?"
     )
 
-    button_text = (
+    button = (
         "Изпрати"
         if lang == "Български"
         else "Send"
@@ -326,7 +345,7 @@ with st.form("emotion_form", clear_on_submit=True):
 
     user_input = st.text_input(question)
 
-    submitted = st.form_submit_button(button_text)
+    submitted = st.form_submit_button(button)
 
     if submitted and user_input:
 
@@ -339,9 +358,9 @@ with st.form("emotion_form", clear_on_submit=True):
             "author": author
         })
 
-# =======================
+# ==================================
 # DISPLAY HISTORY
-# =======================
+# ==================================
 for item in reversed(st.session_state.history):
 
     st.markdown(
@@ -352,6 +371,7 @@ for item in reversed(st.session_state.history):
     st.markdown(
         f"""
         <div class='card'>
+
             {item['reflection']}
 
             <div class='quote'>
@@ -361,6 +381,7 @@ for item in reversed(st.session_state.history):
             <div class='author'>
             — {item['author']}
             </div>
+
         </div>
         """,
         unsafe_allow_html=True
