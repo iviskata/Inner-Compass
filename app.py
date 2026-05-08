@@ -1,5 +1,17 @@
 import streamlit as st
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: radial-gradient(circle at top, #0f172a, #020617);
+    }
 
+    .block-container {
+        padding-top: 2rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
 # ===== PAGE SETTINGS =====
 st.set_page_config(page_title="Inner Compass", page_icon="🏛️")
 
