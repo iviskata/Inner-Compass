@@ -1,7 +1,7 @@
 import streamlit as st
 
 # =======================
-# PAGE CONFIG (must be first Streamlit call)
+# PAGE CONFIG
 # =======================
 st.set_page_config(
     page_title="Inner Compass",
@@ -10,26 +10,34 @@ st.set_page_config(
 )
 
 # =======================
-# STYLE (aesthetic calm UI)
+# STYLE (AESTHETIC UI)
 # =======================
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
     .stApp {
         background: radial-gradient(circle at top, #0f172a, #020617);
         color: #e2e8f0;
+        font-family: 'Inter', sans-serif;
     }
 
     h1 {
         text-align: center;
         color: #f8fafc;
         margin-bottom: 0px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
     }
 
     .subtitle {
         text-align: center;
         color: #94a3b8;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0.3px;
     }
 
     .stTextInput > div > div > input {
@@ -60,52 +68,56 @@ st.markdown(
 # HEADER
 # =======================
 st.markdown("<h1>Inner Compass 🏛️</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>A calm stoic reflection space</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>A calm stoic reflection space.</div>", unsafe_allow_html=True)
 
 # =======================
-# STOIC ENGINE
+# STOIC ENGINE (BG + EN)
 # =======================
 def inner_compass(text):
     t = text.lower()
 
-    if any(w in t for w in ["тъжен", "сам", "болка", "празно", "отчаян"]):
+    # sadness
+    if any(w in t for w in ["тъжен", "sad", "сам", "lonely", "болка", "pain"]):
         return (
-            "💭 Разбирам те. Това, което чувстваш, е тежко.\n\n"
-            "🧭 Това няма да остане завинаги.\n\n"
+            "💭 Разбирам те. / I understand you.\n\n"
+            "🧭 Това ще премине. / This will pass.\n\n"
             "🏛️ „Не ни тревожат нещата, а нашето мнение за тях.“ – Епиктет"
         )
 
-    if any(w in t for w in ["изморен", "изморена", "нямам сили", "изтощен"]):
+    # fatigue
+    if any(w in t for w in ["изморен", "tired", "exhausted", "нямам сили"]):
         return (
-            "💭 Умората ти е сигнал, не слабост.\n\n"
-            "🧭 Почивката е част от растежа.\n\n"
+            "💭 Умората е сигнал, не слабост. / Fatigue is a signal, not weakness.\n\n"
+            "🧭 Почивката е част от напредъка. / Rest is part of progress.\n\n"
             "🏛️ „Трудностите укрепват ума.“ – Сенека"
         )
 
-    if any(w in t for w in ["стрес", "претоварен", "напрежение", "паника"]):
+    # stress
+    if any(w in t for w in ["стрес", "stress", "anxiety", "претоварен"]):
         return (
-            "💭 В момента е твърде много.\n\n"
-            "🧭 Върни се към една малка стъпка.\n\n"
+            "💭 Твърде много наведнъж. / Too much at once.\n\n"
+            "🧭 Една стъпка е достатъчна. / One step is enough.\n\n"
             "🏛️ „Фокусирай се върху това, което зависи от теб.“ – Епиктет"
         )
 
-    if any(w in t for w in ["ядосан", "гняв", "обиден", "нарани"]):
+    # anger
+    if any(w in t for w in ["гняв", "anger", "ядосан", "angry"]):
         return (
-            "💭 Емоцията е силна, но временна.\n\n"
-            "🧭 Реакцията ти е избор.\n\n"
+            "💭 Емоцията е временна. / Emotion is temporary.\n\n"
+            "🧭 Ти избираш реакцията си. / You choose your response.\n\n"
             "🏛️ „Който побеждава себе си, е най-силен.“ – Марк Аврелий"
         )
 
     return (
-        "💭 Добре е, че споделяш това.\n\n"
-        "🧭 Погледни ситуацията по-спокойно.\n\n"
+        "💭 Добре е, че споделяш. / It's good that you share this.\n\n"
+        "🧭 Погледни спокойно. / Look at it calmly.\n\n"
         "🏛️ „Животът е такъв, какъвто го правят мислите ни.“ – Марк Аврелий"
     )
 
 # =======================
 # INPUT
 # =======================
-user = st.text_input("Как се чувстваш?")
+user = st.text_input("Как се чувстваш? / How do you feel?")
 
 # =======================
 # OUTPUT
