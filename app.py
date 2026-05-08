@@ -1,42 +1,43 @@
 import streamlit as st
 import random
 
-# =========================================
+# ======================================
 # PAGE CONFIG
-# =========================================
+# ======================================
 st.set_page_config(
     page_title="Inner Compass",
     page_icon="🏛️",
     layout="centered"
 )
 
-# =========================================
+# ======================================
 # SESSION STATE
-# =========================================
+# ======================================
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# =========================================
-# LANGUAGE SELECTOR
-# =========================================
+# ======================================
+# LANGUAGE ICON
+# ======================================
 st.markdown(
     """
-    <div class="lang-icon">
-        🌍
-    </div>
+    <div class="lang-icon">🌍</div>
     """,
     unsafe_allow_html=True
 )
 
+# ======================================
+# LANGUAGE SELECT
+# ======================================
 lang = st.selectbox(
     "",
     ["Български", "English"],
     label_visibility="collapsed"
 )
 
-# =========================================
-# STYLING
-# =========================================
+# ======================================
+# STYLE
+# ======================================
 st.markdown("""
 <style>
 
@@ -46,7 +47,6 @@ html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
 
-/* BACKGROUND */
 .stApp {
     background:
     radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
@@ -60,11 +60,11 @@ html, body, [class*="css"] {
 .lang-icon {
     text-align: center;
     font-size: 17px;
-    margin-bottom: -4px;
+    margin-bottom: -5px;
     opacity: 0.85;
 }
 
-/* LANGUAGE BOX */
+/* LANGUAGE SELECT */
 div[data-baseweb="select"] {
     max-width: 130px;
     margin: auto;
@@ -105,7 +105,6 @@ h1 {
     border: 1px solid rgba(255,255,255,0.08);
 
     padding-left: 18px;
-    padding-top: 2px;
 }
 
 /* BUTTON */
@@ -184,9 +183,9 @@ h1 {
 </style>
 """, unsafe_allow_html=True)
 
-# =========================================
+# ======================================
 # HEADER
-# =========================================
+# ======================================
 st.markdown(
     "<h1>Inner Compass 🏛️</h1>",
     unsafe_allow_html=True
@@ -201,9 +200,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# =========================================
+# ======================================
 # STOIC DATABASE
-# =========================================
+# ======================================
 stoic_quotes = {
 
     "sadness": [
@@ -312,9 +311,9 @@ stoic_quotes = {
     ]
 }
 
-# =========================================
-# EMOTION DETECTION
-# =========================================
+# ======================================
+# DETECT EMOTION
+# ======================================
 def detect_emotion(text):
 
     t = text.lower()
@@ -354,9 +353,9 @@ def detect_emotion(text):
 
     return "default"
 
-# =========================================
+# ======================================
 # RESPONSE ENGINE
-# =========================================
+# ======================================
 def inner_compass(user_text):
 
     emotion = detect_emotion(user_text)
@@ -378,9 +377,9 @@ def inner_compass(user_text):
 
     return random.choice(stoic_quotes[emotion])
 
-# =========================================
+# ======================================
 # FORM
-# =========================================
+# ======================================
 with st.form("emotion_form", clear_on_submit=True):
 
     question = (
@@ -410,37 +409,30 @@ with st.form("emotion_form", clear_on_submit=True):
             "author": author
         })
 
-# =========================================
+# ======================================
 # DISPLAY HISTORY
-# =========================================
+# ======================================
 for item in reversed(st.session_state.history):
 
     st.markdown(
-        f"""
-        <div class="user">
-        🧠 {item['user']}
-        </div>
-        """,
+        f"<div class='user'>🧠 {item['user']}</div>",
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        f"""
-        <div class="card">
+    card_html = f"""
+    <div class='card'>
 
-            <div>
-            {item['reflection']}
-            </div>
+        <p>{item['reflection']}</p>
 
-            <div class="quote">
-            “{item['quote']}”
-            </div>
+        <p class='quote'>
+        “{item['quote']}”
+        </p>
 
-            <div class="author">
-            — {item['author']}
-            </div>
+        <p class='author'>
+        — {item['author']}
+        </p>
 
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    </div>
+    """
+
+    st.markdown(card_html, unsafe_allow_html=True)
