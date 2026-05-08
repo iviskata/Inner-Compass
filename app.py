@@ -10,34 +10,36 @@ st.set_page_config(
 )
 
 # =======================
-# STYLE (AESTHETIC UI)
+# STYLE (CALM AESTHETIC UI)
 # =======================
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
     .stApp {
         background: radial-gradient(circle at top, #0f172a, #020617);
         color: #e2e8f0;
         font-family: 'Inter', sans-serif;
+        letter-spacing: 0.2px;
     }
 
     h1 {
         text-align: center;
         color: #f8fafc;
-        margin-bottom: 0px;
         font-weight: 600;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+        margin-bottom: 0px;
     }
 
     .subtitle {
         text-align: center;
         color: #94a3b8;
+        font-size: 13px;
         margin-bottom: 25px;
-        font-size: 14px;
         font-weight: 300;
-        letter-spacing: 0.3px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
     }
 
     .stTextInput > div > div > input {
@@ -49,15 +51,22 @@ st.markdown(
     }
 
     .card {
-        margin-top: 20px;
-        padding: 22px;
-        border-radius: 18px;
+        margin-top: 22px;
+        padding: 24px;
+        border-radius: 20px;
         background: rgba(17, 24, 39, 0.65);
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(14px);
         border: 1px solid rgba(255,255,255,0.08);
         color: #e2e8f0;
-        line-height: 1.6;
-        box-shadow: 0px 8px 30px rgba(0,0,0,0.4);
+        line-height: 1.7;
+        box-shadow: 0px 10px 35px rgba(0,0,0,0.45);
+    }
+
+    .circle {
+        text-align: center;
+        font-size: 18px;
+        color: #60a5fa;
+        margin: 10px 0;
     }
     </style>
     """,
@@ -67,63 +76,74 @@ st.markdown(
 # =======================
 # HEADER
 # =======================
-st.markdown("<h1>Inner Compass 🏛️</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>A calm stoic reflection space.</div>", unsafe_allow_html=True)
+st.markdown("<h1>INNER COMPASS 🏛️</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>◉ calm stoic reflection engine ◉</div>", unsafe_allow_html=True)
 
 # =======================
-# STOIC ENGINE (BG + EN)
+# MORE INTELLIGENT STOIC ENGINE
 # =======================
 def inner_compass(text):
     t = text.lower()
 
-    # sadness
-    if any(w in t for w in ["тъжен", "sad", "сам", "lonely", "болка", "pain"]):
+    # sadness / emotional pain
+    if any(w in t for w in [
+        "тъжен","sad","болка","pain","сам","lonely","разбит","empty","празно","отчаян"
+    ]):
         return (
-            "💭 Разбирам те. / I understand you.\n\n"
-            "🧭 Това ще премине. / This will pass.\n\n"
+            "💭 Разбирам те.\n\n"
+            "🧭 Това, което чувстваш, е човешко и временно.\n\n"
             "🏛️ „Не ни тревожат нещата, а нашето мнение за тях.“ – Епиктет"
         )
 
-    # fatigue
-    if any(w in t for w in ["изморен", "tired", "exhausted", "нямам сили"]):
+    # anxiety / overthinking
+    if any(w in t for w in [
+        "стрес","stress","anxiety","претоварен","overthinking","panic","паника","напрежение"
+    ]):
         return (
-            "💭 Умората е сигнал, не слабост. / Fatigue is a signal, not weakness.\n\n"
-            "🧭 Почивката е част от напредъка. / Rest is part of progress.\n\n"
-            "🏛️ „Трудностите укрепват ума.“ – Сенека"
+            "💭 Умът ти е претоварен.\n\n"
+            "🧭 Върни се към настоящия момент.\n\n"
+            "🏛️ „Ако нещо не зависи от теб, не го носи в ума си.“ – Стоицизъм"
         )
 
-    # stress
-    if any(w in t for w in ["стрес", "stress", "anxiety", "претоварен"]):
+    # fatigue / burnout
+    if any(w in t for w in [
+        "изморен","tired","exhausted","нямам сили","burnout","прегорял","изтощен"
+    ]):
         return (
-            "💭 Твърде много наведнъж. / Too much at once.\n\n"
-            "🧭 Една стъпка е достатъчна. / One step is enough.\n\n"
-            "🏛️ „Фокусирай се върху това, което зависи от теб.“ – Епиктет"
+            "💭 Тялото ти говори.\n\n"
+            "🧭 Почивката е част от силата.\n\n"
+            "🏛️ „Дори и най-силният ум има нужда от покой.“ – Сенека"
         )
 
-    # anger
-    if any(w in t for w in ["гняв", "anger", "ядосан", "angry"]):
+    # anger / conflict
+    if any(w in t for w in [
+        "гняв","anger","ядосан","angry","обиден","hurt","нарани"
+    ]):
         return (
-            "💭 Емоцията е временна. / Emotion is temporary.\n\n"
-            "🧭 Ти избираш реакцията си. / You choose your response.\n\n"
-            "🏛️ „Който побеждава себе си, е най-силен.“ – Марк Аврелий"
+            "💭 Емоцията е силна, но временна.\n\n"
+            "🧭 Ти избираш реакцията си.\n\n"
+            "🏛️ „Който владее себе си, владее света си.“ – Марк Аврелий"
         )
 
+    # default
     return (
-        "💭 Добре е, че споделяш. / It's good that you share this.\n\n"
-        "🧭 Погледни спокойно. / Look at it calmly.\n\n"
+        "💭 Това е валидно чувство.\n\n"
+        "🧭 Опитай да го наблюдаваш, без да се отъждествяваш с него.\n\n"
         "🏛️ „Животът е такъв, какъвто го правят мислите ни.“ – Марк Аврелий"
     )
 
 # =======================
 # INPUT
 # =======================
-user = st.text_input("Как се чувстваш? / How do you feel?")
+user = st.text_input("Как се чувстваш?")
 
 # =======================
 # OUTPUT
 # =======================
 if user:
     response = inner_compass(user)
+
+    st.markdown("<div class='circle'>◉</div>", unsafe_allow_html=True)
 
     st.markdown(
         f"""
@@ -133,3 +153,5 @@ if user:
         """,
         unsafe_allow_html=True
     )
+
+    st.markdown("<div class='circle'>◉</div>", unsafe_allow_html=True)
