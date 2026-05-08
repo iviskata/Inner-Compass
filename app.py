@@ -27,7 +27,6 @@ lang = st.selectbox("🌍 Language", ["Български", "English"])
 # =========================
 st.markdown("""
 <style>
-
 .stApp {
     text-align: center;
     background:
@@ -63,7 +62,6 @@ st.markdown("""
 h1, h3, p {
     text-align: center;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -76,38 +74,28 @@ st.markdown("> Продължаваме заедно... по-смирени, п�
 st.markdown("---")
 
 # =========================
-# STOIC RESPONSES
+# RESPONSES
 # =========================
 responses = [
     ("💭 Това ще премине.", "Не страдаме от събитията, а от интерпретацията им.", "Епиктет"),
     ("💭 Спокойствието е сила.", "Контролирай това, което зависи от теб.", "Марк Аврелий"),
     ("💭 Почивката също е прогрес.", "Понякога спирането е напредък.", "Сенека"),
     ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм"),
-    ("💭 Всичко е наред.", "Балансът е истинската сила.", "Стоицизъм")
+    ("💭 Балансът е сила.", "Спокойният ум вижда ясно.", "Стоицизъм")
 ]
 
-# =========================
-# SMART ENGINE (NOW WITH POSITIVE MOOD)
-# =========================
 def get_response(text):
-
     t = text.lower()
 
-    # Negative moods
-    if any(x in t for x in ["стрес", "stress", "panic"]):
+    if "стрес" in t or "stress" in t:
         return responses[1]
-
-    if any(x in t for x in ["тъж", "sad"]):
+    if "тъж" in t or "sad" in t:
         return responses[0]
-
-    if any(x in t for x in ["умор", "tired", "burnout"]):
+    if "умор" in t or "tired" in t:
         return responses[2]
-
-    # Positive moods
-    if any(x in t for x in ["щаст", "happy", "радост", "добре", "ок", "great", "good"]):
+    if "добре" in t or "happy" in t or "ок" in t:
         return responses[4]
 
-    # Default
     return random.choice(responses)
 
 # =========================
@@ -116,13 +104,10 @@ def get_response(text):
 question = "Как се чувстваш?" if lang == "Български" else "How do you feel?"
 
 with st.form("form", clear_on_submit=True):
-
     user_input = st.text_input(question)
-
     send = st.form_submit_button("Изпрати" if lang == "Български" else "Send")
 
     if send and user_input:
-
         r, q, a = get_response(user_input)
 
         st.session_state.history.append({
@@ -137,7 +122,6 @@ with st.form("form", clear_on_submit=True):
 # HISTORY
 # =========================
 for item in reversed(st.session_state.history):
-
     st.markdown(f"**🧠 {item['time']} · {item['text']}**")
     st.info(item["r"])
     st.markdown(f"💭 {item['q']}")
@@ -145,75 +129,54 @@ for item in reversed(st.session_state.history):
     st.markdown("---")
 
 # =========================
-# DAILY SUMMARY (BALANCED)
+# SUMMARY (BOTTOM)
 # =========================
 st.markdown("## 📊 End of Day Reflection")
 
-if st.session_state.history:
+if len(st.session_state.history) > 0:
 
     texts = [h["text"].lower() for h in st.session_state.history]
 
     stress = sum("стрес" in t or "stress" in t for t in texts)
     sad = sum("тъж" in t or "sad" in t for t in texts)
     tired = sum("умор" in t or "tired" in t for t in texts)
+    positive = sum("добре" in t or "ok" in t or "happy" in t for t in texts)
 
-    positive = sum(
-        any(x in t for x in ["щаст", "happy", "добре", "ок", "радост", "good"])
-        for t in texts
-    )
-
-    st.markdown("### 🧠 Баланс на деня")
-
-    st.write(f"😊 Позитивни моменти: {positive}")
-    st.write(f"😣 Стрес моменти: {stress}")
-    st.write(f"😔 Тъга моменти: {sad}")
-    st.write(f"😴 Умора моменти: {tired}")
+    st.write(f"😊 Позитивни: {positive}")
+    st.write(f"😣 Стрес: {stress}")
+    st.write(f"😔 Тъга: {sad}")
+    st.write(f"😴 Умора: {tired}")
 
     st.markdown("---")
 
-    # Summary logic
     if positive >= max(stress, sad, tired):
-        st.success("💭 Денят е бил позитивен. Добър баланс и добра енергия.")
+        st.success("💭 Балансиран и добър ден.")
         st.caption("— Стоицизъм")
 
     elif stress > sad and stress > tired:
-        st.info("💭 Денят беше напрегнат. Помни: контролирай реакцията си.")
+        st.info("💭 Напрегнат ден. Помни: контролирай реакцията си.")
         st.caption("— Марк Аврелий")
-st.markdown("---")
 
-st.markdown("## 🧠 Well-being Guide for Developers")
-
-st.markdown("""
-### 💻 Продуктивни навици за по-добър фокус и здрав ум
-
-#### 🧠 Deep Work
-Работи 60–90 мин без прекъсване върху една задача.
-
-#### 👁️ Правило 20-20-20
-На всеки 20 мин гледай 20 секунди в далечината.
-
-#### 🚶 Movement Breaks
-Ставай на всеки час за кратко движение.
-
-#### 💧 Хидратация
-Пий вода редовно – влияе на концентрацията.
-
-#### 🧘 Мини reset
-1–2 мин дълбоко дишане при стрес.
-
-#### 🎯 Single-tasking
-Една задача = по-добър резултат.
-
-#### 🌙 Shutdown ritual
-Затвори работния ден осъзнато, без мисли за задачи.
-""")
     elif tired > stress:
         st.info("💭 Умората показва нужда от почивка.")
         st.caption("— Сенека")
 
     else:
-        st.info("💭 Денят е бил балансиран. Продължавай така.")
+        st.info("💭 Балансиран ден.")
         st.caption("— Стоицизъм")
 
-else:
-    st.write("Още няма данни за деня.")
+# =========================
+# WELLBEING GUIDE
+# =========================
+st.markdown("---")
+st.markdown("## 🧠 Well-being Guide for Developers")
+
+st.markdown("""
+💻 **Deep Work:** 60–90 мин фокус без прекъсване  
+👁️ **20-20-20:** почивка за очите  
+🚶 **Movement breaks:** ставане на всеки час  
+💧 **Хидратация:** вода за мозъка  
+🧘 **Дишане:** 1–2 мин при стрес  
+🎯 **Single-tasking:** една задача наведнъж  
+🌙 **Shutdown:** затваряне на деня спокойно
+""")
