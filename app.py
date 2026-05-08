@@ -1,43 +1,24 @@
 import streamlit as st
 import random
 
-# ======================================
-# PAGE CONFIG
-# ======================================
+# =================================
+# PAGE
+# =================================
 st.set_page_config(
     page_title="Inner Compass",
     page_icon="🏛️",
     layout="centered"
 )
 
-# ======================================
-# SESSION STATE
-# ======================================
+# =================================
+# MEMORY
+# =================================
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# ======================================
-# LANGUAGE ICON
-# ======================================
-st.markdown(
-    """
-    <div class="lang-icon">🌍</div>
-    """,
-    unsafe_allow_html=True
-)
-
-# ======================================
-# LANGUAGE SELECT
-# ======================================
-lang = st.selectbox(
-    "",
-    ["Български", "English"],
-    label_visibility="collapsed"
-)
-
-# ======================================
+# =================================
 # STYLE
-# ======================================
+# =================================
 st.markdown("""
 <style>
 
@@ -56,50 +37,44 @@ html, body, [class*="css"] {
     color: #e2e8f0;
 }
 
-/* LANGUAGE ICON */
-.lang-icon {
-    text-align: center;
-    font-size: 17px;
-    margin-bottom: -5px;
-    opacity: 0.85;
-}
-
-/* LANGUAGE SELECT */
-div[data-baseweb="select"] {
-    max-width: 130px;
-    margin: auto;
-    margin-bottom: 18px;
-}
-
 /* TITLE */
 h1 {
     text-align: center;
-    color: #f8fafc;
-    margin-bottom: 0px;
+    color: white;
     font-size: 44px;
-    letter-spacing: -1px;
+    margin-bottom: 0px;
 }
 
 /* SUBTITLE */
 .subtitle {
     text-align: center;
     color: #94a3b8;
-    margin-top: 4px;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
     font-size: 13px;
     letter-spacing: 2px;
-    text-transform: uppercase;
+}
+
+/* LANGUAGE ICON */
+.lang {
+    text-align: center;
+    margin-bottom: -5px;
+    font-size: 17px;
+}
+
+/* SELECT */
+div[data-baseweb="select"] {
+    max-width: 130px;
+    margin: auto;
+    margin-bottom: 20px;
 }
 
 /* INPUT */
 .stTextInput input {
     height: 62px;
+    border-radius: 16px;
     font-size: 18px;
 
-    border-radius: 16px;
-
-    background: rgba(15,23,42,0.90);
-
+    background: rgba(15,23,42,0.9);
     color: white;
 
     border: 1px solid rgba(255,255,255,0.08);
@@ -113,7 +88,6 @@ h1 {
     height: 50px;
 
     border-radius: 14px;
-
     border: none;
 
     background: linear-gradient(
@@ -123,23 +97,18 @@ h1 {
     );
 
     color: white;
-
     font-size: 16px;
-    font-weight: 500;
-
-    margin-top: 6px;
 }
 
-/* USER TEXT */
+/* USER */
 .user {
     color: #60a5fa;
-    margin-top: 24px;
+    margin-top: 25px;
     margin-bottom: 8px;
     font-weight: 500;
-    font-size: 15px;
 }
 
-/* RESPONSE CARD */
+/* CARD */
 .card {
     padding: 20px;
 
@@ -147,65 +116,60 @@ h1 {
 
     background: rgba(15,23,42,0.72);
 
-    backdrop-filter: blur(16px);
-
     border: 1px solid rgba(255,255,255,0.06);
 
     line-height: 1.8;
-
-    color: #e2e8f0;
-
-    font-size: 16px;
 
     box-shadow: 0 4px 30px rgba(0,0,0,0.25);
 }
 
 /* QUOTE */
 .quote {
-    margin-top: 16px;
-
+    margin-top: 15px;
     color: #cbd5e1;
-
     font-style: italic;
-
-    line-height: 1.6;
 }
 
 /* AUTHOR */
 .author {
     margin-top: 8px;
-
     color: #94a3b8;
-
     font-size: 14px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ======================================
+# =================================
+# LANGUAGE
+# =================================
+st.markdown("<div class='lang'>🌍</div>", unsafe_allow_html=True)
+
+lang = st.selectbox(
+    "",
+    ["Български", "English"],
+    label_visibility="collapsed"
+)
+
+# =================================
 # HEADER
-# ======================================
+# =================================
 st.markdown(
     "<h1>Inner Compass 🏛️</h1>",
     unsafe_allow_html=True
 )
 
 st.markdown(
-    """
-    <div class="subtitle">
-    ◉ calm stoic reflection engine ◉
-    </div>
-    """,
+    "<div class='subtitle'>◉ calm stoic reflection engine ◉</div>",
     unsafe_allow_html=True
 )
 
-# ======================================
-# STOIC DATABASE
-# ======================================
-stoic_quotes = {
+# =================================
+# DATABASE
+# =================================
+quotes = {
 
-    "sadness": [
+    "sad": [
 
         (
             "💭 Това чувство няма да остане завинаги.",
@@ -217,12 +181,6 @@ stoic_quotes = {
             "💭 Дори тежките дни преминават.",
             "Душата става по-силна чрез трудностите.",
             "Сенека"
-        ),
-
-        (
-            "💭 Тъгата е момент, не твоята същност.",
-            "Всичко се променя.",
-            "Марк Аврелий"
         )
     ],
 
@@ -238,22 +196,10 @@ stoic_quotes = {
             "💭 Спокойствието е сила.",
             "Спокойният ум носи яснота.",
             "Сенека"
-        ),
-
-        (
-            "💭 Една малка стъпка е достатъчна.",
-            "Контролирай това, което зависи от теб.",
-            "Епиктет"
         )
     ],
 
-    "fatigue": [
-
-        (
-            "💭 Тялото ти има нужда от пауза.",
-            "Понякога почивката е най-мъдрото действие.",
-            "Сенека"
-        ),
+    "tired": [
 
         (
             "💭 Възстановяването също е прогрес.",
@@ -266,99 +212,39 @@ stoic_quotes = {
             "Силният ум знае кога да спре.",
             "Марк Аврелий"
         )
-    ],
-
-    "anger": [
-
-        (
-            "💭 Реакцията ти е по-важна от ситуацията.",
-            "Най-доброто отмъщение е да не приличаш на този, който те е наранил.",
-            "Марк Аврелий"
-        ),
-
-        (
-            "💭 Направи пауза преди действие.",
-            "Този, който владее себе си, е истински силен.",
-            "Сенека"
-        ),
-
-        (
-            "💭 Спокойствието връща ясната мисъл.",
-            "Свободата започва с контрол над реакциите.",
-            "Епиктет"
-        )
-    ],
-
-    "fear": [
-
-        (
-            "💭 Бъдещето още не е дошло.",
-            "Често страдаме повече във въображението си.",
-            "Сенека"
-        ),
-
-        (
-            "💭 Не позволявай на страха да управлява деня ти.",
-            "Пречката по пътя се превръща в самия път.",
-            "Марк Аврелий"
-        ),
-
-        (
-            "💭 Не е нужно да контролираш всичко.",
-            "Приеми това, което не зависи от теб.",
-            "Епиктет"
-        )
     ]
 }
 
-# ======================================
+# =================================
 # DETECT EMOTION
-# ======================================
-def detect_emotion(text):
+# =================================
+def detect(text):
 
     t = text.lower()
 
-    if any(word in t for word in [
-        "тъжен", "тъжна", "sad",
-        "болка", "pain",
-        "сам", "lonely"
+    if any(x in t for x in [
+        "тъжен","тъжна","sad","сам"
     ]):
-        return "sadness"
+        return "sad"
 
-    if any(word in t for word in [
-        "стрес", "stress",
-        "anxiety", "паника",
-        "overthinking"
+    if any(x in t for x in [
+        "стрес","stress","паника"
     ]):
         return "stress"
 
-    if any(word in t for word in [
-        "изморен", "изморена",
-        "tired", "burnout",
-        "exhausted"
+    if any(x in t for x in [
+        "изморен","изморена","tired"
     ]):
-        return "fatigue"
-
-    if any(word in t for word in [
-        "яд", "гняв",
-        "angry", "anger"
-    ]):
-        return "anger"
-
-    if any(word in t for word in [
-        "страх", "fear",
-        "worried", "scared"
-    ]):
-        return "fear"
+        return "tired"
 
     return "default"
 
-# ======================================
-# RESPONSE ENGINE
-# ======================================
-def inner_compass(user_text):
+# =================================
+# RESPONSE
+# =================================
+def answer(user_text):
 
-    emotion = detect_emotion(user_text)
+    emotion = detect(user_text)
 
     if emotion == "default":
 
@@ -375,12 +261,12 @@ def inner_compass(user_text):
             "Марк Аврелий"
         )
 
-    return random.choice(stoic_quotes[emotion])
+    return random.choice(quotes[emotion])
 
-# ======================================
+# =================================
 # FORM
-# ======================================
-with st.form("emotion_form", clear_on_submit=True):
+# =================================
+with st.form("form", clear_on_submit=True):
 
     question = (
         "Как се чувстваш?"
@@ -388,7 +274,7 @@ with st.form("emotion_form", clear_on_submit=True):
         else "How do you feel?"
     )
 
-    button_text = (
+    button = (
         "Изпрати"
         if lang == "Български"
         else "Send"
@@ -396,11 +282,11 @@ with st.form("emotion_form", clear_on_submit=True):
 
     user_input = st.text_input(question)
 
-    submitted = st.form_submit_button(button_text)
+    submit = st.form_submit_button(button)
 
-    if submitted and user_input:
+    if submit and user_input:
 
-        reflection, quote, author = inner_compass(user_input)
+        reflection, quote, author = answer(user_input)
 
         st.session_state.history.append({
             "user": user_input,
@@ -409,9 +295,9 @@ with st.form("emotion_form", clear_on_submit=True):
             "author": author
         })
 
-# ======================================
-# DISPLAY HISTORY
-# ======================================
+# =================================
+# SHOW HISTORY
+# =================================
 for item in reversed(st.session_state.history):
 
     st.markdown(
@@ -419,20 +305,21 @@ for item in reversed(st.session_state.history):
         unsafe_allow_html=True
     )
 
-    card_html = f"""
-    <div class='card'>
+    st.markdown(
+        f"""
+<div class='card'>
 
-        <p>{item['reflection']}</p>
+{item['reflection']}
 
-        <p class='quote'>
-        “{item['quote']}”
-        </p>
+<div class='quote'>
+“{item['quote']}”
+</div>
 
-        <p class='author'>
-        — {item['author']}
-        </p>
+<div class='author'>
+— {item['author']}
+</div>
 
-    </div>
-    """
-
-    st.markdown(card_html, unsafe_allow_html=True)
+</div>
+        """,
+        unsafe_allow_html=True
+    )
