@@ -71,13 +71,8 @@ h1, h3, p {
 # HEADER
 # =========================
 st.title("Inner Compass 🏛️")
-
 st.markdown("### H-TECH · DIGITAL SYSTEMS")
-
-st.markdown(
-    "> Продължаваме заедно... по-смирени, по-смислени, по-стоически."
-)
-
+st.markdown("> Продължаваме заедно... по-смирени, по-смислени, по-стоически.")
 st.markdown("---")
 
 # =========================
@@ -87,19 +82,32 @@ responses = [
     ("💭 Това ще премине.", "Не страдаме от събитията, а от интерпретацията им.", "Епиктет"),
     ("💭 Спокойствието е сила.", "Контролирай това, което зависи от теб.", "Марк Аврелий"),
     ("💭 Почивката също е прогрес.", "Понякога спирането е напредък.", "Сенека"),
-    ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм")
+    ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм"),
+    ("💭 Всичко е наред.", "Балансът е истинската сила.", "Стоицизъм")
 ]
 
+# =========================
+# SMART ENGINE (NOW WITH POSITIVE MOOD)
+# =========================
 def get_response(text):
+
     t = text.lower()
 
-    if "стрес" in t or "stress" in t:
+    # Negative moods
+    if any(x in t for x in ["стрес", "stress", "panic"]):
         return responses[1]
-    if "тъж" in t or "sad" in t:
+
+    if any(x in t for x in ["тъж", "sad"]):
         return responses[0]
-    if "умор" in t or "tired" in t:
+
+    if any(x in t for x in ["умор", "tired", "burnout"]):
         return responses[2]
 
+    # Positive moods
+    if any(x in t for x in ["щаст", "happy", "радост", "добре", "ок", "great", "good"]):
+        return responses[4]
+
+    # Default
     return random.choice(responses)
 
 # =========================
@@ -126,22 +134,18 @@ with st.form("form", clear_on_submit=True):
         })
 
 # =========================
-# HISTORY OUTPUT
+# HISTORY
 # =========================
 for item in reversed(st.session_state.history):
 
     st.markdown(f"**🧠 {item['time']} · {item['text']}**")
-
     st.info(item["r"])
-
     st.markdown(f"💭 {item['q']}")
-
     st.caption(f"— {item['a']}")
-
     st.markdown("---")
 
 # =========================
-# DAILY SUMMARY (BOTTOM)
+# DAILY SUMMARY (BALANCED)
 # =========================
 st.markdown("## 📊 End of Day Reflection")
 
@@ -153,20 +157,31 @@ if st.session_state.history:
     sad = sum("тъж" in t or "sad" in t for t in texts)
     tired = sum("умор" in t or "tired" in t for t in texts)
 
-    st.markdown("### 🧠 Емоционален баланс")
+    positive = sum(
+        any(x in t for x in ["щаст", "happy", "добре", "ок", "радост", "good"])
+        for t in texts
+    )
 
-    st.write(f"Стрес моменти: {stress}")
-    st.write(f"Тъга моменти: {sad}")
-    st.write(f"Умора моменти: {tired}")
+    st.markdown("### 🧠 Баланс на деня")
+
+    st.write(f"😊 Позитивни моменти: {positive}")
+    st.write(f"😣 Стрес моменти: {stress}")
+    st.write(f"😔 Тъга моменти: {sad}")
+    st.write(f"😴 Умора моменти: {tired}")
 
     st.markdown("---")
 
-    if stress > sad and stress > tired:
-        st.info("💭 Денят беше напрегнат. Помни: не всичко зависи от теб.")
+    # Summary logic
+    if positive >= max(stress, sad, tired):
+        st.success("💭 Денят е бил позитивен. Добър баланс и добра енергия.")
+        st.caption("— Стоицизъм")
+
+    elif stress > sad and stress > tired:
+        st.info("💭 Денят беше напрегнат. Помни: контролирай реакцията си.")
         st.caption("— Марк Аврелий")
 
     elif tired > stress:
-        st.info("💭 Денят показва умора. Почивката е част от силата.")
+        st.info("💭 Умората показва нужда от почивка.")
         st.caption("— Сенека")
 
     else:
