@@ -12,6 +12,7 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True
+)
 # ===== PAGE SETTINGS =====
 st.set_page_config(page_title="Inner Compass", page_icon="🏛️")
 
