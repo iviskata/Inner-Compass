@@ -2,7 +2,7 @@ import streamlit as st
 import random
 
 # =========================
-# CONFIG
+# PAGE CONFIG
 # =========================
 st.set_page_config(
     page_title="H-Tech · Inner Compass",
@@ -17,16 +17,68 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # =========================
+# STYLE (CENTER FIX)
+# =========================
+st.markdown("""
+<style>
+
+.stApp {
+    text-align: center;
+    background:
+    radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
+    radial-gradient(circle at bottom, rgba(168,85,247,0.12), transparent 30%),
+    #020617;
+
+    color: #e2e8f0;
+}
+
+/* INPUT CENTER FIX */
+.stTextInput {
+    display: flex;
+    justify-content: center;
+}
+
+.stTextInput input {
+    width: 100%;
+    max-width: 500px;
+    height: 60px;
+    border-radius: 16px;
+    font-size: 18px;
+}
+
+/* BUTTON CENTER */
+.stButton {
+    display: flex;
+    justify-content: center;
+}
+
+.stButton button {
+    width: 100%;
+    max-width: 500px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(90deg,#2563eb,#7c3aed);
+    color: white;
+    border: none;
+}
+
+/* TEXT CENTER */
+h1, h3, p {
+    text-align: center;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
 # HEADER
 # =========================
 st.title("Inner Compass 🏛️")
 
-st.markdown(
-    "### H-TECH · DIGITAL SYSTEMS"
-)
+st.markdown("### H-TECH · DIGITAL SYSTEMS")
 
 st.markdown(
-    "> *Продължаваме заедно... по-смирени, по-смислени, по-стоически.*"
+    "> Продължаваме заедно... по-смирени, по-смислени, по-стоически."
 )
 
 st.markdown("---")
@@ -35,16 +87,17 @@ st.markdown("---")
 # STOIC RESPONSES
 # =========================
 responses = [
-    ("💭 Това ще премине.", "Не страдаме от събитията, а от нашата интерпретация.", "Епиктет"),
+    ("💭 Това ще премине.", "Не страдаме от събитията, а от интерпретацията им.", "Епиктет"),
     ("💭 Спокойствието е сила.", "Контролирай това, което зависи от теб.", "Марк Аврелий"),
-    ("💭 Почивката също е прогрес.", "Понякога спирането е напредък.", "Сенека"),
+    ("💭 Почивката е прогрес.", "Понякога спирането е напредък.", "Сенека"),
     ("💭 Бъди тук и сега.", "Животът се случва в настоящия момент.", "Стоицизъм")
 ]
 
 # =========================
-# SIMPLE AI LOGIC
+# ENGINE
 # =========================
 def get_response(text):
+
     t = text.lower()
 
     if "тъж" in t or "sad" in t:
@@ -59,23 +112,27 @@ def get_response(text):
     return random.choice(responses)
 
 # =========================
-# INPUT
+# INPUT (ENTER WORKS)
 # =========================
-user_input = st.text_input("Как се чувстваш?")
+with st.form("form", clear_on_submit=True):
 
-if st.button("Изпрати") and user_input:
+    user_input = st.text_input("Как се чувстваш?")
 
-    r, q, a = get_response(user_input)
+    submitted = st.form_submit_button("Изпрати")
 
-    st.session_state.history.append({
-        "user": user_input,
-        "r": r,
-        "q": q,
-        "a": a
-    })
+    if submitted and user_input:
+
+        r, q, a = get_response(user_input)
+
+        st.session_state.history.append({
+            "user": user_input,
+            "r": r,
+            "q": q,
+            "a": a
+        })
 
 # =========================
-# OUTPUT (CARDS)
+# OUTPUT
 # =========================
 for item in reversed(st.session_state.history):
 
@@ -83,7 +140,7 @@ for item in reversed(st.session_state.history):
 
     st.info(item["r"])
 
-    st.markdown(f"💭 *{item['q']}*")
+    st.markdown(f"💭 {item['q']}")
 
     st.caption(f"— {item['a']}")
 
