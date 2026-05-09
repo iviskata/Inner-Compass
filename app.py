@@ -17,7 +17,15 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # =========================
-# GLOBAL STYLE (UI HIERARCHY FIX)
+# LANGUAGE (RESTORED ✔)
+# =========================
+lang = st.selectbox("🌍 Language", ["Български", "English"])
+
+def t(bg, en):
+    return bg if lang == "Български" else en
+
+# =========================
+# STYLE (ONLY UI HIERARCHY FIX - SAFE)
 # =========================
 st.markdown("""
 <style>
@@ -27,50 +35,37 @@ html, body {
     color: #e2e8f0;
 }
 
-/* CENTER CHAT - MAKE IT DOMINANT */
-textarea, input {
-    font-size: 18px !important;
-}
-
-/* INPUT FIELD BIGGER */
 .stTextInput input {
     font-size: 20px !important;
     height: 60px !important;
 }
 
-/* BUTTON */
 .stButton button {
     font-size: 16px !important;
-    padding: 10px 20px !important;
 }
 
-/* HEADINGS */
 h1 {
     text-align: center;
     font-size: 34px;
 }
 
-h3 {
-    font-size: 20px;
-}
-
-/* MAKE SIDE PANELS SMALLER VISUALLY */
 [data-testid="column"] {
-    font-size: 13px;
-}
-
-/* WELLBEING MORE COMPACT */
-.stExpander {
     font-size: 13px;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
+# HEADER (LANGUAGE FIXED ✔)
 # =========================
 st.markdown("<h1>Inner Compass</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; opacity:0.7;'>⟡ Продължаваме заедно... по-смирени, по-смислени, по-стоически ⟡</p>", unsafe_allow_html=True)
+
+motto = t(
+"⟡ Продължаваме заедно... по-смирени, по-смислени, по-стоически ⟡",
+"⟡ We continue together... more humble, more meaningful, more stoic ⟡"
+)
+
+st.markdown(f"<p style='text-align:center; opacity:0.7;'>{motto}</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -106,12 +101,12 @@ RESPONSES = {
 }
 
 # =========================
-# LAYOUT (CHAT = MAIN FOCUS)
+# LAYOUT
 # =========================
 left, center, right = st.columns([1, 3, 1.2])
 
 # =========================
-# LEFT - ANALYSIS (SMALLER)
+# LEFT - ANALYSIS
 # =========================
 with left:
     st.markdown("### 🧠 Анализ")
@@ -124,18 +119,15 @@ with left:
         st.markdown(f"<p style='font-size:12px; opacity:0.7'>{k}: {v}</p>", unsafe_allow_html=True)
 
 # =========================
-# CENTER - CHAT (MADE BIGGER + PRIORITY)
+# CENTER - CHAT (MAIN FOCUS)
 # =========================
 with center:
 
-    st.markdown("### Как се чувстваш?")
+    st.markdown(t("### Как се чувстваш?", "### How do you feel?"))
 
     with st.form("form", clear_on_submit=True):
-        text = st.text_input(
-            "Сподели състояние...",
-            placeholder="напр. изморена съм, стресиран съм...",
-        )
-        send = st.form_submit_button("Изпрати")
+        text = st.text_input(t("Сподели състояние...", "Share your state..."))
+        send = st.form_submit_button(t("Изпрати", "Send"))
 
         if send and text:
             emo = detect(text)
@@ -154,26 +146,44 @@ with center:
         st.markdown("---")
 
 # =========================
-# RIGHT - WELL-BEING (SMALLER VISUAL WEIGHT)
+# RIGHT - WELL-BEING (UNCHANGED STRUCTURE)
 # =========================
 with right:
 
-    st.markdown("### 🧘 Well-being")
+    st.markdown(t("### 🧘 Well-being", "### 🧘 Well-being"))
 
     with st.expander("⟡ Дишане"):
-        st.write("Намалява стрес реакцията и стабилизира вниманието.")
+        st.write(t(
+            "Намалява стрес реакцията и стабилизира вниманието.",
+            "Reduces stress response and stabilizes attention."
+        ))
 
     with st.expander("⟡ 20–20–20"):
-        st.write("Намалява напрежението в очите.")
+        st.write(t(
+            "Намалява напрежението в очите.",
+            "Reduces eye strain."
+        ))
 
     with st.expander("⟡ Движение"):
-        st.write("Възстановява кръвообращението.")
+        st.write(t(
+            "Възстановява кръвообращението.",
+            "Improves circulation."
+        ))
 
     with st.expander("⟡ Хидратация"):
-        st.write("Поддържа концентрацията.")
+        st.write(t(
+            "Поддържа концентрацията.",
+            "Maintains focus."
+        ))
 
     with st.expander("⟡ Фокус"):
-        st.write("Един контекст = по-висока ефективност.")
+        st.write(t(
+            "Един контекст = по-висока ефективност.",
+            "Single tasking improves performance."
+        ))
 
     with st.expander("⟡ Почивка"):
-        st.write("Почивката е част от продуктивността.")
+        st.write(t(
+            "Почивката е част от продуктивността.",
+            "Rest is part of productivity."
+        ))
