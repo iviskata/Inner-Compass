@@ -18,7 +18,7 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # =========================
-# LANGUAGE
+# LANGUAGE SYSTEM
 # =========================
 lang = st.selectbox("Language", ["Български", "English"])
 
@@ -26,15 +26,7 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
-# MOTTO
-# =========================
-motto = t(
-    "Продължаваме заедно... по-смирени, по-смислени, по-стоически.",
-    "We continue together... more humble, more meaningful, more stoic."
-)
-
-# =========================
-# STYLE
+# STYLE FIX (CENTER HEADER)
 # =========================
 st.markdown("""
 <style>
@@ -47,50 +39,90 @@ st.markdown("""
     color: #e2e8f0;
 }
 
+h1, h2, h3, p {
+    text-align: center;
+}
+
 .block-container {
     padding-top: 2rem;
+    max-width: 1100px;
+    margin: auto;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
+# HEADER (FIXED CENTER)
 # =========================
-st.title("Inner Compass")
-st.markdown("### H-TECH · DIGITAL SYSTEMS")
-st.markdown(f"> {motto}")
+st.markdown("<h1 style='text-align:center;'>Inner Compass</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align:center;'>H-TECH · DIGITAL SYSTEMS</h3>", unsafe_allow_html=True)
+
+motto = t(
+    "Продължаваме заедно... по-смирени, по-смислени, по-стоически.",
+    "We continue together... more humble, more meaningful, more stoic."
+)
+
+st.markdown(f"<p style='text-align:center;'>⟡ {motto}</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # =========================
-# 🧠 EMOTION ENGINE (IMPROVED DETECTION)
+# 🧠 EMOTION ENGINE (FIXED REAL WORLD INPUTS)
 # =========================
 
 EMOTION_BANK = {
-"stress": "⟡ Усещането за напрежение идва от претоварен фокус. Най-ясният път е да се върнеш към една стъпка.",
-"anger": "⟡ Гневът е силен импулс, който изисква пауза преди действие.",
-"sad": "⟡ Тъгата е процес, не състояние за решение.",
-"inspiration": "⟡ Това е момент на разширено възприятие и вътрешна яснота.",
-"neutral": "⟡ Стабилно състояние без доминираща емоция."
+"stress": t(
+"⟡ Това напрежение показва претоварване. Не е нужно да решиш всичко наведнъж — само следващата стъпка.",
+"⟡ This tension indicates overload. You don't need to solve everything, only the next step."
+),
+
+"sad": t(
+"⟡ Това състояние показва вътрешна тежест. То не е постоянно и не определя посоката ти.",
+"⟡ This state reflects internal heaviness. It is temporary and does not define your direction."
+),
+
+"anger": t(
+"⟡ Силната емоция показва натрупан вътрешен натиск. Пауза преди реакция променя всичко.",
+"⟡ Strong emotion indicates internal pressure. A pause before reaction changes everything."
+),
+
+"work_stress": t(
+"⟡ Работната неудовлетвореност често идва от несъответствие между среда и вътрешни нужди.",
+"⟡ Work dissatisfaction often comes from mismatch between environment and internal needs."
+),
+
+"inspiration": t(
+"⟡ Това състояние показва яснота и разширено мислене. Добър момент за създаване.",
+"⟡ This state reflects clarity and expanded thinking. A good moment for creation."
+),
+
+"neutral": t(
+"⟡ Стабилно вътрешно състояние без доминиращо напрежение.",
+"⟡ Stable internal state without dominant tension."
+)
 }
 
+# =========================
+# DETECTION (FIXED - REAL PHRASES)
+# =========================
 def detect_emotion(text):
     ttxt = text.lower()
 
-    # ANGER (expanded)
-    if any(w in ttxt for w in ["яд", "ядос", "гнев", "разяр", "раздраз"]):
-        return "anger"
-
-    # SAD (expanded)
-    if any(w in ttxt for w in ["тъж", "плача", "самот", "болка"]):
+    # STRONG NEGATIVE STATES
+    if any(w in ttxt for w in ["не ми е добре", "зле съм", "not well", "feeling bad"]):
         return "sad"
 
-    # STRESS (expanded)
-    if any(w in ttxt for w in ["стрес", "напрег", "претовар", "pressure"]):
+    if any(w in ttxt for w in ["нещастна съм", "нещастен съм", "не съм щастлив", "unhappy"]):
+        return "work_stress"
+
+    # STANDARD STATES
+    if any(w in ttxt for w in ["стрес", "напрег", "stress"]):
         return "stress"
 
-    # INSPIRATION
-    if any(w in ttxt for w in ["вдъхнов", "мотив", "силен съм", "енерг"]):
+    if any(w in ttxt for w in ["яд", "гнев", "раздраз"]):
+        return "anger"
+
+    if any(w in ttxt for w in ["вдъхнов", "мотив", "енерг"]):
         return "inspiration"
 
     return "neutral"
@@ -99,13 +131,14 @@ def get_response(text):
     return EMOTION_BANK[detect_emotion(text)]
 
 # =========================
-# ANALYTICS ENGINE
+# ANALYSIS ENGINE (FIXED LOGIC)
 # =========================
 def analyze():
     counts = {
         "stress": 0,
-        "anger": 0,
         "sad": 0,
+        "anger": 0,
+        "work_stress": 0,
         "inspiration": 0,
         "neutral": 0
     }
@@ -113,29 +146,47 @@ def analyze():
     for h in st.session_state.history:
         counts[h["emotion"]] += 1
 
-    # real dominant logic (NOT fake balance)
-    dominant = max(counts, key=counts.get)
+    # weighted dominance (IMPORTANT FIX)
+    weighted_score = {
+        "stress": counts["stress"] * 2,
+        "sad": counts["sad"] * 2,
+        "anger": counts["anger"] * 3,
+        "work_stress": counts["work_stress"] * 3,
+        "inspiration": counts["inspiration"] * 1,
+        "neutral": counts["neutral"] * 0.5
+    }
+
+    dominant = max(weighted_score, key=weighted_score.get)
 
     return counts, dominant
 
-def stoic_insight(dominant, counts):
-    if dominant == "stress":
-        return "⟡ Стоическа перспектива: напрежението не е проблемът — разпиленият фокус е."
-    if dominant == "anger":
-        return "⟡ Стоиците биха казали: паузата преди реакция е мястото на свободата."
-    if dominant == "sad":
-        return "⟡ Това е временно вътрешно движение, не дефиниция на реалността."
-    if dominant == "inspiration":
-        return "⟡ Яснотата идва, когато умът е свободен от вътрешен шум."
-    return "⟡ Балансът не е липса на емоции, а стабилност въпреки тях."
+def stoic_insight(dominant):
+    return t(
+        {
+            "stress": "⟡ Стоически поглед: напрежението идва от разпилено внимание.",
+            "sad": "⟡ Това е временно състояние, не крайна реалност.",
+            "anger": "⟡ Контролът започва с пауза преди реакция.",
+            "work_stress": "⟡ Несъответствието между среда и вътрешни нужди създава напрежение.",
+            "inspiration": "⟡ Яснотата е момент на подредено съзнание.",
+            "neutral": "⟡ Балансът е стабилност, не липса на емоции."
+        }.get(dominant, "⟡ Наблюдение без интерпретация."),
+        {
+            "stress": "⟡ Stoic view: tension comes from divided attention.",
+            "sad": "⟡ Temporary state, not reality.",
+            "anger": "⟡ Control begins with pause.",
+            "work_stress": "⟡ Mismatch creates internal tension.",
+            "inspiration": "⟡ Clarity is ordered mind.",
+            "neutral": "⟡ Balance is stability, not absence."
+        }.get(dominant, "⟡ Neutral observation.")
+    )
 
 # =========================
-# LAYOUT (FIXED RATIO)
+# LAYOUT (FIXED BALANCE)
 # =========================
-left, center, right = st.columns([1, 2.2, 1])
+left, center, right = st.columns([0.9, 2.2, 1.3])
 
 # =========================
-# LEFT → ANALYSIS (SMALLER)
+# LEFT → SMALL ANALYSIS (FIXED VISUAL WEIGHT)
 # =========================
 with left:
     st.markdown("## 🧠 " + t("Анализ", "Analysis"))
@@ -144,23 +195,23 @@ with left:
         counts, dominant = analyze()
 
         st.metric(t("Стрес", "Stress"), counts["stress"])
-        st.metric(t("Яд", "Anger"), counts["anger"])
         st.metric(t("Тъга", "Sad"), counts["sad"])
-        st.metric(t("Вдъхнов", "Inspiration"), counts["inspiration"])
+        st.metric(t("Яд", "Anger"), counts["anger"])
+        st.metric(t("Работа", "Work"), counts["work_stress"])
 
         st.markdown("---")
 
-        st.markdown("### ⟡ Dominant")
-        st.info(dominant)
+        st.markdown("### ⟡")
+        st.info(t("Доминиращо:", "Dominant: ") + dominant)
 
-        st.markdown("### 🏛️ Insight")
-        st.write(stoic_insight(dominant, counts))
+        st.markdown("### 🏛️")
+        st.write(stoic_insight(dominant))
 
     else:
         st.write(t("Няма данни", "No data yet"))
 
 # =========================
-# CENTER → CHAT (BIGGEST)
+# CENTER → CHAT (MAIN FOCUS)
 # =========================
 with center:
 
@@ -189,25 +240,25 @@ with center:
         st.markdown("---")
 
 # =========================
-# RIGHT → WELLBEING (CLEAN)
+# RIGHT → WELLBEING (FULL BG FIXED + EXPANDED)
 # =========================
 with right:
     st.markdown("## 🧘 " + t("Система", "System"))
 
     with st.expander(t("Фокус", "Focus")):
         st.write(t(
-            "Deep Work, Single-tasking, 3 приоритета",
-            "Deep Work, Single-tasking, 3 priorities"
+            "Deep Work – дълбока концентрация\nSingle-tasking – една задача\n3 приоритета на ден",
+            "Deep Work – deep focus\nSingle-tasking – one task\n3 priorities per day"
         ))
 
     with st.expander(t("Възстановяване", "Recovery")):
         st.write(t(
-            "Почивки, вода, край на деня",
-            "Breaks, hydration, shutdown"
+            "Почивки между цикли\nХидратация и движение\nОсъзнат край на деня",
+            "Break cycles\nHydration and movement\nConscious shutdown"
         ))
 
     with st.expander(t("Баланс", "Balance")):
         st.write(t(
-            "Ум ↔ Тяло ↔ Време",
-            "Mind ↔ Body ↔ Time"
+            "Ум ↔ Тяло ↔ Енергия\nНатоварване ↔ Почивка",
+            "Mind ↔ Body ↔ Energy\nLoad ↔ Rest"
         ))
