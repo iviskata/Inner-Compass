@@ -1,5 +1,4 @@
 import streamlit as st
-import random
 from datetime import datetime
 
 # =========================
@@ -30,7 +29,6 @@ def t(bg, en):
 # =========================
 st.markdown("""
 <style>
-
 .stApp {
     background:
     radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
@@ -47,7 +45,6 @@ st.markdown("""
 h1,h2,h3,p {
     text-align: center;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -65,32 +62,32 @@ st.markdown(f"<p style='text-align:center;'>⟡ {motto}</p>", unsafe_allow_html=
 st.markdown("---")
 
 # =========================
-# 🧠 EMOTION ENGINE
+# 🧠 EMOTION RESPONSES
 # =========================
 EMOTION_BANK = {
 "stress": t(
-"⟡ Това показва когнитивно претоварване. Фокус върху една задача възстановява яснота.",
-"⟡ Cognitive overload detected. Focus restores clarity."
+"⟡ Налице е когнитивно претоварване. Фокус върху една задача ще върне яснота и контрол.",
+"⟡ Cognitive overload detected. Focusing on one task restores clarity and control."
 ),
 
 "sad": t(
-"⟡ Емоционална тежест. Това състояние е временно и преходно.",
-"⟡ Emotional heaviness. This state is temporary."
+"⟡ Това е състояние на емоционална тежест. То е временно и не определя посоката ти.",
+"⟡ This is an emotional heaviness state. Temporary and not defining your direction."
 ),
 
 "anger": t(
-"⟡ Повишена емоционална реакция. Пауза преди действие е ключова.",
-"⟡ Elevated emotional response. Pause before action is key."
+"⟡ Засечена е повишена реактивност. Пауза преди действие ще намали напрежението.",
+"⟡ Elevated reactivity detected. A pause before action reduces tension."
 ),
 
 "work_stress": t(
-"⟡ Работно напрежение или неудовлетворение от средата.",
-"⟡ Work-related stress or dissatisfaction."
+"⟡ Работен дисбаланс или напрежение. Средата може да не съответства на нуждите ти.",
+"⟡ Work imbalance or tension detected. Environment may not match your needs."
 ),
 
 "inspiration": t(
-"⟡ Повишена яснота и мотивация. Подходящ момент за действие.",
-"⟡ High clarity and motivation. Good moment for action."
+"⟡ Повишена яснота и мотивация. Подходящ момент за действие и създаване.",
+"⟡ High clarity and motivation. A good moment for action and creation."
 ),
 
 "neutral": t(
@@ -100,24 +97,33 @@ EMOTION_BANK = {
 }
 
 # =========================
-# FIXED DETECTION (IMPORTANT)
+# 🧠 SMART EMOTION BRAIN (FIXED VERSION)
 # =========================
 def detect_emotion(text):
     ttxt = text.lower().strip()
 
-    if any(p in ttxt for p in ["нещастна съм в работата", "не съм щастлив в работата", "работата ме напряга"]):
+    # WORK CONTEXT
+    if any(w in ttxt for w in ["работа", "офис", "колеги", "шеф"]) and any(w in ttxt for w in ["нещаст", "зле", "стрес", "тежко", "не ми харесва"]):
         return "work_stress"
 
-    if any(p in ttxt for p in ["не ми е добре", "зле съм", "тъжна съм", "тъжен съм"]):
+    # EMOTIONAL HEAVINESS
+    if any(w in ttxt for w in ["не ми е добре", "празно", "срив", "тъж", "разбит", "нещаст"]):
         return "sad"
 
-    if any(p in ttxt for p in ["ядосвам", "гнев", "раздраз"]):
-        return "anger"
-
-    if any(p in ttxt for p in ["стрес", "напрег", "претовар"]):
+    # STRESS / OVERLOAD
+    if any(w in ttxt for w in ["стрес", "напрег", "претовар", "overwhelmed", "много ми е"]):
         return "stress"
 
-    if any(p in ttxt for p in ["вдъхнов", "мотив", "енерг"]):
+    # ANGER
+    if any(w in ttxt for w in ["ядос", "гнев", "драз", "не мога да понасям"]):
+        return "anger"
+
+    # RECOVERY / FATIGUE (IMPORTANT FIX)
+    if any(w in ttxt for w in ["умор", "изтощен", "нямам сила", "искам да спя", "нямам енергия"]):
+        return "stress"
+
+    # INSPIRATION
+    if any(w in ttxt for w in ["вдъхнов", "мотив", "енергич", "flow", "ясно ми е"]):
         return "inspiration"
 
     return "neutral"
@@ -126,51 +132,33 @@ def get_response(text):
     return EMOTION_BANK[detect_emotion(text)]
 
 # =========================
-# 🧠 ANALYSIS (NEW PROFESSIONAL MODEL - BG)
+# ANALYTICS (CLEAN VERSION)
 # =========================
 def analyze():
     counts = {
-        "cognitive_load": 0,
-        "pressure": 0,
-        "emotional_strain": 0,
-        "stable": 0,
-        "engagement": 0,
-        "recovery": 0
+        "stress": 0,
+        "sad": 0,
+        "anger": 0,
+        "work_stress": 0,
+        "inspiration": 0,
+        "neutral": 0
     }
 
     for h in st.session_state.history:
         e = h["emotion"]
-
-        if e in ["stress"]:
-            counts["cognitive_load"] += 1
-
-        elif e in ["anger"]:
-            counts["pressure"] += 1
-
-        elif e in ["sad", "work_stress"]:
-            counts["emotional_strain"] += 1
-
-        elif e in ["neutral"]:
-            counts["stable"] += 1
-
-        elif e in ["inspiration"]:
-            counts["engagement"] += 1
-
-        else:
-            counts["recovery"] += 1
+        counts[e] += 1
 
     dominant = max(counts, key=counts.get)
     return counts, dominant
 
-
 def label(key):
     labels = {
-        "cognitive_load": "🧠 Когнитивно натоварване",
-        "pressure": "⚡ Повишен натиск",
-        "emotional_strain": "🌫 Емоционално напрежение",
-        "stable": "⚖ Стабилно състояние",
-        "engagement": "🚀 Висока ангажираност",
-        "recovery": "🧯 Нужда от възстановяване"
+        "stress": "⚡ Когнитивно натоварване",
+        "sad": "🌫 Емоционално напрежение",
+        "anger": "🔥 Повишен натиск",
+        "work_stress": "💼 Работно напрежение",
+        "inspiration": "🚀 Висока ангажираност",
+        "neutral": "⚖ Стабилно състояние"
     }
     return labels[key]
 
@@ -180,10 +168,10 @@ def label(key):
 left, center, right = st.columns([1, 2.3, 1.3])
 
 # =========================
-# LEFT → ANALYSIS (FIXED)
+# LEFT (ANALYSIS)
 # =========================
 with left:
-    st.markdown("## 🧠 Работен профил")
+    st.markdown("## 🧠 Анализ")
 
     if st.session_state.history:
         counts, dominant = analyze()
@@ -192,14 +180,12 @@ with left:
             st.metric(label(k), v)
 
         st.markdown("---")
-
-        st.info(f"⟡ Доминиращо състояние:\n\n{label(dominant)}")
-
+        st.info(f"⟡ Доминиращо:\n\n{label(dominant)}")
     else:
         st.write("Няма данни.")
 
 # =========================
-# CENTER → CHAT
+# CENTER (CHAT)
 # =========================
 with center:
 
@@ -228,16 +214,16 @@ with center:
         st.markdown("---")
 
 # =========================
-# RIGHT → WELLBEING SYSTEM
+# RIGHT (WELLBEING)
 # =========================
 with right:
-    st.markdown("## 🧘 Система за баланс и продуктивност")
+    st.markdown("## 🧘 Well-being система")
 
-    with st.expander("🎯 Система за фокус"):
+    with st.expander("🎯 Фокус"):
         st.write("Deep Work · Single-tasking · Приоритети")
 
-    with st.expander("🧠 Система за възстановяване"):
-        st.write("Почивки · Хидратация · Рестарт на вниманието")
+    with st.expander("🧠 Възстановяване"):
+        st.write("Паузи · Хидратация · Рестарт на вниманието")
 
-    with st.expander("⚖ Система за баланс"):
-        st.write("Ум ↔ Тяло ↔ Енергия · Натоварване ↔ Почивка")
+    with st.expander("⚖ Баланс"):
+        st.write("Натоварване ↔ Почивка · Ум ↔ Енергия")
