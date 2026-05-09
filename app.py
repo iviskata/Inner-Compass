@@ -25,10 +25,18 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
-# STYLE
+# STYLE (UNIFIED + PRIORITY CHAT)
 # =========================
 st.markdown("""
 <style>
+
+/* GLOBAL TYPOGRAPHY */
+html, body, [class*="css"] {
+    font-size: 16px;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+/* BACKGROUND */
 .stApp {
     background:
     radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
@@ -37,13 +45,34 @@ st.markdown("""
     color: #e2e8f0;
 }
 
+/* CENTER WIDTH */
 .block-container {
-    max-width: 1150px;
+    max-width: 1100px;
+    padding-top: 2rem;
 }
 
-h1,h2,h3,p {
+/* CENTER TEXT ONLY WHERE NEEDED */
+h1,h2 {
     text-align: center;
 }
+
+/* CHAT PRIORITY */
+.stTextInput input {
+    font-size: 18px !important;
+    height: 55px;
+}
+
+/* RESPONSE BOX EMPHASIS */
+.stInfo {
+    font-size: 16px;
+}
+
+/* SECONDARY (WELLBEING SMALLER) */
+.secondary {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -52,14 +81,12 @@ h1,h2,h3,p {
 # =========================
 st.markdown("<h1 style='text-align:center;'>Inner Compass</h1>", unsafe_allow_html=True)
 
-st.markdown(f"""
-<p style='text-align:center;'>
-⟡ {t(
-"Продължаваме заедно... по-смирени, по-смислени, по-стоически.",
-"We continue together... more humble, more meaningful, more stoic."
-)}
-</p>
-""", unsafe_allow_html=True)
+motto = t(
+    "⟡ Продължаваме заедно... по-смирени, по-смислени, по-стоически. ⟡",
+    "⟡ We continue together... more humble, more meaningful, more stoic. ⟡"
+)
+
+st.markdown(f"<p style='text-align:center;'>{motto}</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -68,28 +95,28 @@ st.markdown("---")
 # =========================
 RESPONSES = {
 "stress": t(
-"⟡ Налице е когнитивно претоварване. Намаляването на задачите ще възстанови яснотата.",
+"⟡ Когнитивно претоварване. Намаляването на задачите ще върне яснота.",
 "⟡ Cognitive overload detected. Reducing tasks restores clarity."
 ),
 
 "sad": t(
-"⟡ Емоционална тежест. Това състояние е временно и не определя посоката ти.",
-"⟡ Emotional heaviness. This state is temporary."
+"⟡ Емоционална тежест. Това състояние е временно.",
+"⟡ Emotional heaviness. This is temporary."
 ),
 
 "anger": t(
-"⟡ Повишена реактивност. Пауза преди действие намалява интензитета.",
+"⟡ Повишена реактивност. Пауза ще намали интензитета.",
 "⟡ High reactivity detected. Pause reduces intensity."
 ),
 
 "work_stress": t(
-"⟡ Работно напрежение. Средата може да не съвпада с вътрешните ти нужди.",
-"⟡ Work stress detected. Environment may not match your needs."
+"⟡ Работно напрежение. Средата може да не съвпада с нуждите ти.",
+"⟡ Work stress detected. Environment mismatch possible."
 ),
 
 "recovery": t(
-"⟡ Налице е изтощение. Това е сигнал за нужда от възстановяване, не слабост.",
-"⟡ Fatigue detected. This is a signal for need of recovery, not weakness."
+"⟡ Изтощение. Това е сигнал за нужда от възстановяване, не слабост.",
+"⟡ Fatigue detected. Signal for need of recovery, not weakness."
 ),
 
 "inspiration": t(
@@ -104,32 +131,28 @@ RESPONSES = {
 }
 
 # =========================
-# 🧠 EMOTION ENGINE
+# EMOTION ENGINE
 # =========================
 def detect_emotion(text):
     ttxt = text.lower()
 
-    if any(w in ttxt for w in ["работа", "офис", "шеф", "колеги"]) and any(w in ttxt for w in ["стрес", "не харесвам", "зле"]):
-        return "work_stress"
-
-    if any(w in ttxt for w in ["не ми е добре", "тъж", "празно", "разбит"]):
-        return "sad"
-
-    if any(w in ttxt for w in ["стрес", "напрег", "претовар", "overwhelmed"]):
-        return "stress"
-
-    if any(w in ttxt for w in ["ядос", "гнев", "драз"]):
-        return "anger"
-
-    # ✅ FIXED: recovery is ONLY state, not solution
-    if any(w in ttxt for w in [
-        "уморена съм", "уморен съм", "изморена съм", "изморен съм",
-        "изтощена съм", "изтощен съм", "нямам сила", "нямам енергия",
-        "искам да спя"
-    ]):
+    if any(w in ttxt for w in ["уморена съм","уморен съм","изморена","изморен","изтощен","нямам сила","нямам енергия"]):
         return "recovery"
 
-    if any(w in ttxt for w in ["вдъхнов", "мотив", "енергич", "flow"]):
+    if any(w in ttxt for w in ["стрес","напрег","претовар","overwhelmed"]):
+        return "stress"
+
+    if any(w in ttxt for w in ["не ми е добре","тъж","празно","разбит"]):
+        return "sad"
+
+    if any(w in ttxt for w in ["ядос","гнев","драз"]):
+        return "anger"
+
+    if any(w in ttxt for w in ["работа","офис","колеги","шеф"]):
+        if any(w in ttxt for w in ["зле","стрес","не харесвам","тежко"]):
+            return "work_stress"
+
+    if any(w in ttxt for w in ["вдъхнов","мотив","flow","енергич"]):
         return "inspiration"
 
     return "neutral"
@@ -160,27 +183,28 @@ def analyze():
 # =========================
 # LAYOUT
 # =========================
-left, center, right = st.columns([1, 2.3, 1.3])
+left, center, right = st.columns([1, 2.5, 1.2])
 
 # =========================
-# LEFT - ANALYSIS
+# LEFT - ANALYSIS (SMALLER)
 # =========================
 with left:
-    st.markdown("## 🧠 Анализ")
+    st.markdown("### 🧠 Анализ")
 
     if st.session_state.history:
         counts, dominant = analyze()
 
         for k, v in counts.items():
-            st.metric(label=k, value=v)
+            st.markdown(f"<p class='secondary'>{k}: {v}</p>", unsafe_allow_html=True)
 
         st.markdown("---")
-        st.info(f"⟡ Доминиращо състояние:\n\n{dominant}")
+        st.markdown(f"<p class='secondary'>Доминиращо: {dominant}</p>", unsafe_allow_html=True)
+
     else:
-        st.write("Няма данни.")
+        st.markdown("<p class='secondary'>Няма данни</p>", unsafe_allow_html=True)
 
 # =========================
-# CENTER - CHAT
+# CENTER - CHAT (PRIORITY)
 # =========================
 with center:
 
@@ -208,35 +232,19 @@ with center:
         st.markdown("---")
 
 # =========================
-# RIGHT - WELL-BEING SYSTEM (IMPROVED)
+# RIGHT - WELLBEING (COLLAPSIBLE + SMALLER)
 # =========================
 with right:
-    st.markdown("## 🧘 Well-being система")
+    st.markdown("### 🧘 Well-being система")
 
-    st.markdown("""
-### 🎯 Фокус и продуктивност
-⟡ Поддържане на ясни приоритети  
-⟡ Работа на блокове (deep work)  
-⟡ Избягване на мултитаскинг  
+    with st.expander("🎯 Фокус"):
+        st.markdown("<p class='secondary'>Deep Work · Single-tasking · Приоритети</p>", unsafe_allow_html=True)
 
----
+    with st.expander("🧠 Ментално състояние"):
+        st.markdown("<p class='secondary'>Натоварване · Стрес модели · Когнитивна яснота</p>", unsafe_allow_html=True)
 
-### 🧠 Ментално състояние
-⟡ Следене на когнитивно натоварване  
-⟡ Разпознаване на умора и претоварване  
-⟡ Ранно откриване на стрес модели  
+    with st.expander("🧯 Възстановяване"):
+        st.markdown("<p class='secondary'>Почивки · Хидратация · Рестарт на вниманието</p>", unsafe_allow_html=True)
 
----
-
-### 🧯 Възстановяване
-⟡ Планирани паузи и рестарт на вниманието  
-⟡ Намаляване на входяща информация  
-⟡ Подобряване на енергийния баланс  
-
----
-
-### ⚖ Общ баланс
-⟡ Баланс между натоварване и почивка  
-⟡ Устойчив ритъм на работа  
-⟡ Поддържане на стабилност в дългосрочен план  
-""")
+    with st.expander("⚖ Баланс"):
+        st.markdown("<p class='secondary'>Натоварване ↔ Почивка · Устойчив ритъм</p>", unsafe_allow_html=True)
