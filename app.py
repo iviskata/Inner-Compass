@@ -52,83 +52,24 @@ h1,h2,h3,p {
 # =========================
 st.markdown("<h1 style='text-align:center;'>Inner Compass</h1>", unsafe_allow_html=True)
 
-st.markdown(f"<p style='text-align:center;'>⟡ {t('Продължаваме заедно... по-смирени, по-смислени, по-стоически.',
-'We continue together... more humble, more meaningful, more stoic.')}</p>", unsafe_allow_html=True)
+st.markdown(f"""
+<p style='text-align:center;'>
+⟡ {t(
+"Продължаваме заедно... по-смирени, по-смислени, по-стоически.",
+"We continue together... more humble, more meaningful, more stoic."
+)}
+</p>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
 # =========================
-# 🧠 EMOTION DATASET (BRAIN)
-# =========================
-
-RECOVERY = [
-"уморена съм","уморен съм","изморена съм","изморен съм","изтощена съм","изтощен съм",
-"нямам енергия","нямам сила","срината съм","изцедена съм","не мога повече",
-"празна съм","искам да спя","burnout","не издържам","психически изтощена"
-]
-
-STRESS = [
-"стресирана съм","стресиран съм","напрегната съм","напрегнат съм","претоварена съм",
-"претоварен съм","overwhelmed","твърде много ми е","хаос","не смогвам",
-"не ми стига времето","под напрежение съм"
-]
-
-SAD = [
-"не ми е добре","тъжна съм","тъжен съм","празнота","разбита съм","разбит съм",
-"вътрешно тежко","самотна съм","изгубена съм","няма смисъл","сривам се"
-]
-
-ANGER = [
-"ядосана съм","ядосан съм","бесна съм","бесен съм","дразня се","кипя",
-"не издържам","изнервена съм","изнервен съм","всичко ме дразни"
-]
-
-FOCUS_OVERLOAD = [
-"не мога да мисля","твърде много мисли","хаос в главата","не мога да се фокусирам",
-"объркана съм","объркан съм","mental fog","блокирана съм","блокиран съм"
-]
-
-INSPIRATION = [
-"вдъхновена съм","вдъхновен съм","мотивирана съм","мотивиран съм","flow",
-"ясно ми е","имам енергия","готов съм","готова съм","искам да действам"
-]
-
-# =========================
-# 🧠 EMOTION ENGINE (SMART MATCH)
-# =========================
-def detect_emotion(text):
-    ttxt = text.lower()
-
-    def match(group):
-        return any(p in ttxt for p in group)
-
-    if match(RECOVERY):
-        return "recovery"
-    if match(STRESS):
-        return "stress"
-    if match(SAD):
-        return "sad"
-    if match(ANGER):
-        return "anger"
-    if match(FOCUS_OVERLOAD):
-        return "focus"
-    if match(INSPIRATION):
-        return "inspiration"
-
-    return "neutral"
-
-# =========================
-# RESPONSES
+# EMOTION RESPONSES
 # =========================
 RESPONSES = {
-"recovery": t(
-"⟡ Наблюдава се ясно изтощение. Това е сигнал за възстановяване, не слабост.",
-"⟡ Clear fatigue detected. This is a signal for recovery, not weakness."
-),
-
 "stress": t(
-"⟡ Налице е натрупано напрежение. Намаляването на задачите ще върне контрол.",
-"⟡ Accumulated stress detected. Reducing tasks restores control."
+"⟡ Налице е когнитивно претоварване. Намаляването на задачите ще възстанови яснотата.",
+"⟡ Cognitive overload detected. Reducing tasks restores clarity."
 ),
 
 "sad": t(
@@ -137,18 +78,23 @@ RESPONSES = {
 ),
 
 "anger": t(
-"⟡ Повишена реактивност. Пауза ще намали интензитета на реакцията.",
+"⟡ Повишена реактивност. Пауза преди действие намалява интензитета.",
 "⟡ High reactivity detected. Pause reduces intensity."
 ),
 
-"focus": t(
-"⟡ Когнитивен хаос. Нужно е опростяване на задачите и фокус.",
-"⟡ Cognitive chaos detected. Simplification and focus needed."
+"work_stress": t(
+"⟡ Работно напрежение. Средата може да не съвпада с вътрешните ти нужди.",
+"⟡ Work stress detected. Environment may not match your needs."
+),
+
+"recovery": t(
+"⟡ Налице е изтощение. Това е сигнал за нужда от възстановяване, не слабост.",
+"⟡ Fatigue detected. This is a signal for need of recovery, not weakness."
 ),
 
 "inspiration": t(
-"⟡ Висока яснота и енергия. Подходящ момент за действие.",
-"⟡ High clarity and energy. Good moment for action."
+"⟡ Висока яснота и мотивация. Подходящ момент за действие.",
+"⟡ High clarity and motivation. Good moment for action."
 ),
 
 "neutral": t(
@@ -158,15 +104,49 @@ RESPONSES = {
 }
 
 # =========================
+# 🧠 EMOTION ENGINE
+# =========================
+def detect_emotion(text):
+    ttxt = text.lower()
+
+    if any(w in ttxt for w in ["работа", "офис", "шеф", "колеги"]) and any(w in ttxt for w in ["стрес", "не харесвам", "зле"]):
+        return "work_stress"
+
+    if any(w in ttxt for w in ["не ми е добре", "тъж", "празно", "разбит"]):
+        return "sad"
+
+    if any(w in ttxt for w in ["стрес", "напрег", "претовар", "overwhelmed"]):
+        return "stress"
+
+    if any(w in ttxt for w in ["ядос", "гнев", "драз"]):
+        return "anger"
+
+    # ✅ FIXED: recovery is ONLY state, not solution
+    if any(w in ttxt for w in [
+        "уморена съм", "уморен съм", "изморена съм", "изморен съм",
+        "изтощена съм", "изтощен съм", "нямам сила", "нямам енергия",
+        "искам да спя"
+    ]):
+        return "recovery"
+
+    if any(w in ttxt for w in ["вдъхнов", "мотив", "енергич", "flow"]):
+        return "inspiration"
+
+    return "neutral"
+
+def get_response(text):
+    return RESPONSES[detect_emotion(text)]
+
+# =========================
 # ANALYSIS
 # =========================
 def analyze():
     counts = {
-        "recovery": 0,
         "stress": 0,
         "sad": 0,
         "anger": 0,
-        "focus": 0,
+        "work_stress": 0,
+        "recovery": 0,
         "inspiration": 0,
         "neutral": 0
     }
@@ -178,7 +158,7 @@ def analyze():
     return counts, dominant
 
 # =========================
-# UI LAYOUT
+# LAYOUT
 # =========================
 left, center, right = st.columns([1, 2.3, 1.3])
 
@@ -192,7 +172,7 @@ with left:
         counts, dominant = analyze()
 
         for k, v in counts.items():
-            st.metric(k, v)
+            st.metric(label=k, value=v)
 
         st.markdown("---")
         st.info(f"⟡ Доминиращо състояние:\n\n{dominant}")
@@ -204,10 +184,10 @@ with left:
 # =========================
 with center:
 
-    q = t("Как се чувстваш?", "How do you feel?")
+    question = t("Как се чувстваш?", "How do you feel?")
 
     with st.form("form", clear_on_submit=True):
-        user_input = st.text_input(q)
+        user_input = st.text_input(question)
         send = st.form_submit_button(t("Изпрати", "Send"))
 
         if send and user_input:
@@ -217,7 +197,7 @@ with center:
                 "time": datetime.now().strftime("%H:%M"),
                 "text": user_input,
                 "emotion": emotion,
-                "response": RESPONSES[emotion]
+                "response": get_response(user_input)
             })
 
     st.markdown("---")
@@ -228,16 +208,35 @@ with center:
         st.markdown("---")
 
 # =========================
-# RIGHT - WELLBEING
+# RIGHT - WELL-BEING SYSTEM (IMPROVED)
 # =========================
 with right:
     st.markdown("## 🧘 Well-being система")
 
-    with st.expander("🎯 Фокус"):
-        st.write("Deep Work · Single-tasking · Приоритети")
+    st.markdown("""
+### 🎯 Фокус и продуктивност
+⟡ Поддържане на ясни приоритети  
+⟡ Работа на блокове (deep work)  
+⟡ Избягване на мултитаскинг  
 
-    with st.expander("🧠 Възстановяване"):
-        st.write("Почивки · Хидратация · Рестарт")
+---
 
-    with st.expander("⚖ Баланс"):
-        st.write("Натоварване ↔ Почивка · Ум ↔ Енергия")
+### 🧠 Ментално състояние
+⟡ Следене на когнитивно натоварване  
+⟡ Разпознаване на умора и претоварване  
+⟡ Ранно откриване на стрес модели  
+
+---
+
+### 🧯 Възстановяване
+⟡ Планирани паузи и рестарт на вниманието  
+⟡ Намаляване на входяща информация  
+⟡ Подобряване на енергийния баланс  
+
+---
+
+### ⚖ Общ баланс
+⟡ Баланс между натоварване и почивка  
+⟡ Устойчив ритъм на работа  
+⟡ Поддържане на стабилност в дългосрочен план  
+""")
