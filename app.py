@@ -25,52 +25,69 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
-# STYLE (UNIFIED + PRIORITY CHAT)
+# STYLE (TYPOGRAPHY SYSTEM v2)
 # =========================
 st.markdown("""
 <style>
 
-/* GLOBAL TYPOGRAPHY */
-html, body, [class*="css"] {
-    font-size: 16px;
+/* BASE */
+html, body {
     font-family: Inter, system-ui, sans-serif;
-}
-
-/* BACKGROUND */
-.stApp {
-    background:
-    radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
-    radial-gradient(circle at bottom, rgba(168,85,247,0.12), transparent 30%),
-    #020617;
+    background: #020617;
     color: #e2e8f0;
 }
 
-/* CENTER WIDTH */
+/* LAYOUT */
 .block-container {
     max-width: 1100px;
     padding-top: 2rem;
 }
 
-/* CENTER TEXT ONLY WHERE NEEDED */
-h1,h2 {
-    text-align: center;
+/* =========================
+   TYPOGRAPHY SYSTEM
+========================= */
+
+/* PRIMARY (CHAT) */
+.primary-text {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
-/* CHAT PRIORITY */
+/* SECONDARY (ANALYSIS) */
+.secondary-text {
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0.85;
+    line-height: 1.4;
+}
+
+/* TERTIARY (WELLBEING) */
+.tertiary-text {
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.75;
+    line-height: 1.4;
+}
+
+/* META (MOTTO / SMALL UI TEXT) */
+.meta-text {
+    font-size: 13px;
+    font-weight: 300;
+    opacity: 0.6;
+    letter-spacing: 0.3px;
+}
+
+/* INPUT EMPHASIS */
 .stTextInput input {
     font-size: 18px !important;
     height: 55px;
+    font-weight: 500;
 }
 
-/* RESPONSE BOX EMPHASIS */
-.stInfo {
-    font-size: 16px;
-}
-
-/* SECONDARY (WELLBEING SMALLER) */
-.secondary {
-    font-size: 13px;
-    opacity: 0.85;
+/* CENTER TITLE */
+h1 {
+    text-align: center;
 }
 
 </style>
@@ -79,14 +96,14 @@ h1,h2 {
 # =========================
 # HEADER
 # =========================
-st.markdown("<h1 style='text-align:center;'>Inner Compass</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Inner Compass</h1>", unsafe_allow_html=True)
 
 motto = t(
     "⟡ Продължаваме заедно... по-смирени, по-смислени, по-стоически. ⟡",
     "⟡ We continue together... more humble, more meaningful, more stoic. ⟡"
 )
 
-st.markdown(f"<p style='text-align:center;'>{motto}</p>", unsafe_allow_html=True)
+st.markdown(f"<p class='meta-text' style='text-align:center;'>{motto}</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -105,12 +122,12 @@ RESPONSES = {
 ),
 
 "anger": t(
-"⟡ Повишена реактивност. Пауза ще намали интензитета.",
+"⟡ Повишена реактивност. Пауза преди действие намалява интензитета.",
 "⟡ High reactivity detected. Pause reduces intensity."
 ),
 
 "work_stress": t(
-"⟡ Работно напрежение. Средата може да не съвпада с нуждите ти.",
+"⟡ Работно напрежение. Средата може да не съвпада с вътрешните ти нужди.",
 "⟡ Work stress detected. Environment mismatch possible."
 ),
 
@@ -186,7 +203,7 @@ def analyze():
 left, center, right = st.columns([1, 2.5, 1.2])
 
 # =========================
-# LEFT - ANALYSIS (SMALLER)
+# LEFT - ANALYSIS
 # =========================
 with left:
     st.markdown("### 🧠 Анализ")
@@ -195,13 +212,13 @@ with left:
         counts, dominant = analyze()
 
         for k, v in counts.items():
-            st.markdown(f"<p class='secondary'>{k}: {v}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p class='secondary-text'>{k}: {v}</p>", unsafe_allow_html=True)
 
         st.markdown("---")
-        st.markdown(f"<p class='secondary'>Доминиращо: {dominant}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='secondary-text'>Доминиращо: {dominant}</p>", unsafe_allow_html=True)
 
     else:
-        st.markdown("<p class='secondary'>Няма данни</p>", unsafe_allow_html=True)
+        st.markdown("<p class='secondary-text'>Няма данни</p>", unsafe_allow_html=True)
 
 # =========================
 # CENTER - CHAT (PRIORITY)
@@ -227,24 +244,24 @@ with center:
     st.markdown("---")
 
     for h in reversed(st.session_state.history):
-        st.markdown(f"**{h['time']} · {h['text']}**")
+        st.markdown(f"<p class='primary-text'><b>{h['time']} · {h['text']}</b></p>", unsafe_allow_html=True)
         st.info(h["response"])
         st.markdown("---")
 
 # =========================
-# RIGHT - WELLBEING (COLLAPSIBLE + SMALLER)
+# RIGHT - WELLBEING (SECONDARY COLLAPSIBLE STYLE)
 # =========================
 with right:
     st.markdown("### 🧘 Well-being система")
 
     with st.expander("🎯 Фокус"):
-        st.markdown("<p class='secondary'>Deep Work · Single-tasking · Приоритети</p>", unsafe_allow_html=True)
+        st.markdown("<p class='tertiary-text'>Deep Work · Single-tasking · Приоритети</p>", unsafe_allow_html=True)
 
     with st.expander("🧠 Ментално състояние"):
-        st.markdown("<p class='secondary'>Натоварване · Стрес модели · Когнитивна яснота</p>", unsafe_allow_html=True)
+        st.markdown("<p class='tertiary-text'>Когнитивно натоварване · Стрес модели · Яснота</p>", unsafe_allow_html=True)
 
     with st.expander("🧯 Възстановяване"):
-        st.markdown("<p class='secondary'>Почивки · Хидратация · Рестарт на вниманието</p>", unsafe_allow_html=True)
+        st.markdown("<p class='tertiary-text'>Почивки · Хидратация · Рестарт на вниманието</p>", unsafe_allow_html=True)
 
     with st.expander("⚖ Баланс"):
-        st.markdown("<p class='secondary'>Натоварване ↔ Почивка · Устойчив ритъм</p>", unsafe_allow_html=True)
+        st.markdown("<p class='tertiary-text'>Натоварване ↔ Почивка · Устойчив ритъм</p>", unsafe_allow_html=True)
