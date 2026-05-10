@@ -25,6 +25,39 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
+# CALM AESTHETIC STYLE 🌿
+# =========================
+st.markdown("""
+<style>
+
+/* soft gradient background */
+.stApp {
+    background: linear-gradient(135deg, #e8f5f0 0%, #f4f7ff 50%, #eef9f2 100%);
+}
+
+/* glass-like cards */
+div[data-testid="stMetric"] {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    backdrop-filter: blur(8px);
+}
+
+/* sidebar soft */
+section[data-testid="stSidebar"] {
+    background: rgba(255,255,255,0.6);
+}
+
+/* text soft */
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
 # DATA
 # =========================
 employees = ["Employee A", "Employee B", "Employee C", "Employee D"]
@@ -38,68 +71,31 @@ departments = [
 ]
 
 # =========================
-# EMOTIONAL ENGINE
+# EMOTIONS
 # =========================
 emotion_responses = {
     "Good": [
         "Днес си в стабилен и лек ритъм.",
         "Енергията ти е подредена.",
-        "Добър баланс между фокус и спокойствие.",
-        "Стабилна продуктивност без напрежение.",
-        "Всичко ти е на място днес."
+        "Спокоен и продуктивен ден.",
+        "Балансът ти работи добре.",
+        "Добър поток на мисли и работа."
     ],
     "Neutral": [
-        "Спокоен и равен ден.",
-        "Нищо крайно — и това е окей.",
-        "Балансът е стабилен.",
+        "Спокоен, равен ден.",
+        "Баланс без крайности.",
         "Тих работен ритъм.",
-        "Неутрално състояние."
+        "Стабилно състояние.",
+        "Нормален ден — и това е окей."
     ],
     "Bad": [
         "Труден момент — но временен.",
         "Дишай и забави темпото.",
-        "Не си сам в това.",
-        "Това ще премине.",
-        "Почивката е правилният ход."
+        "Почивката е правилният ход.",
+        "Не носи всичко сам.",
+        "Това ще премине."
     ]
 }
-
-# =========================
-# UI STYLE (premium feel)
-# =========================
-st.markdown("""
-<style>
-.block-container {
-    padding-top: 2rem;
-}
-.metric-card {
-    background: #ffffff;
-    padding: 18px;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    text-align: center;
-}
-.small-title {
-    font-size: 13px;
-    color: gray;
-}
-.big-number {
-    font-size: 28px;
-    font-weight: 600;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
-# HEADER (PREMIUM)
-# =========================
-st.markdown("""
-<div style='text-align:center; padding:20px 0;'>
-    <h1>Inner Compass</h1>
-    <p style='color:gray;'>AI HR & Wellbeing Intelligence Platform</p>
-</div>
-<hr>
-""", unsafe_allow_html=True)
 
 # =========================
 # SIDEBAR
@@ -115,8 +111,19 @@ menu = st.sidebar.radio(
     ]
 )
 
+# =========================
+# HEADER
+# =========================
+st.markdown("""
+<div style='text-align:center; padding:10px 0 20px 0;'>
+    <h1>Inner Compass</h1>
+    <p style='color:#5f6f81;'>AI HR & Wellbeing Intelligence Platform</p>
+</div>
+<hr style='opacity:0.3'>
+""", unsafe_allow_html=True)
+
 # =========================================================
-# DASHBOARD (CARD STYLE)
+# DASHBOARD
 # =========================================================
 if menu == t("Табло", "Dashboard"):
 
@@ -126,7 +133,6 @@ if menu == t("Табло", "Dashboard"):
 
     if len(data) == 0:
         st.info(t("Няма данни", "No data yet"))
-
     else:
 
         moods = [d["mood"] for d in data]
@@ -134,18 +140,10 @@ if menu == t("Табло", "Dashboard"):
 
         col1, col2, col3, col4 = st.columns(4)
 
-        with col1:
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Entries</div><div class='big-number'>{len(data)}</div></div>", unsafe_allow_html=True)
-
-        with col2:
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Good</div><div class='big-number'>{moods.count('Good')}</div></div>", unsafe_allow_html=True)
-
-        with col3:
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Bad</div><div class='big-number'>{moods.count('Bad')}</div></div>", unsafe_allow_html=True)
-
-        with col4:
-            avg = sum(energy)/len(energy)
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Energy</div><div class='big-number'>{avg:.1f}</div></div>", unsafe_allow_html=True)
+        col1.metric("Entries", len(data))
+        col2.metric("Good", moods.count("Good"))
+        col3.metric("Bad", moods.count("Bad"))
+        col4.metric("Energy", f"{sum(energy)/len(energy):.1f}")
 
         st.write("---")
 
@@ -190,7 +188,7 @@ elif menu == t("Въвеждане", "Check-in"):
         st.info(random.choice(emotion_responses[mood]))
 
 # =========================================================
-# AI INSIGHTS (UNCHANGED LOGIC, CLEAN UI)
+# AI INSIGHTS
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
@@ -200,7 +198,6 @@ elif menu == t("AI анализ", "AI Insights"):
 
     if len(data) == 0:
         st.info(t("Няма данни", "No data"))
-
     else:
 
         bad_ratio = len([d for d in data if d["mood"] == "Bad"]) / len(data)
@@ -214,8 +211,8 @@ elif menu == t("AI анализ", "AI Insights"):
             ))
 
             st.write(t(
-                "Препоръка: намаляване на натоварването и повече почивки.",
-                "Recommendation: reduce workload and increase breaks."
+                "Препоръка: повече почивки и по-ниско натоварване.",
+                "Recommendation: more breaks and reduced workload."
             ))
 
         elif avg_energy < 5:
@@ -227,7 +224,7 @@ elif menu == t("AI анализ", "AI Insights"):
 
             st.write(t(
                 "Препоръка: по-лек ритъм.",
-                "Recommendation: lighter workload."
+                "Recommendation: lighter pace."
             ))
 
         else:
@@ -238,8 +235,8 @@ elif menu == t("AI анализ", "AI Insights"):
             ))
 
             st.info(t(
-                "Продължете текущия подход.",
-                "Continue current approach."
+                "Продължете текущия баланс.",
+                "Continue current balance."
             ))
 
 # =========================================================
@@ -255,53 +252,45 @@ elif menu == t("Данни", "Data"):
         st.dataframe(st.session_state.data, use_container_width=True)
 
 # =========================================================
-# WELLBEING (PREMIUM RESTORED)
+# WELLBEING
 # =========================================================
 elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
-    st.title(t("Баланс работа и ум", "Work & Mind Balance"))
+    st.title(t("Баланс ум и работа", "Work & Mind Balance"))
 
     st.markdown(t("""
 ## 🪑 Ергономия
 - Правилна стойка  
 - Монитор на нивото на очите  
 - Удобен стол  
-- Без прегърбване  
 
 ## ⏱ Ритъм
 - Почивки на 45–60 мин  
-- 50/10 цикъл  
-- Разделяй задачите  
+- Баланс работа/почивка  
 
 ## 🧠 Ментално здраве
-- Без мултитаскинг  
-- Фокус върху 1 задача  
-- Намаляване на известия  
+- Фокус върху една задача  
+- Без излишни известия  
 
 ## 🌿 Възстановяване
 - Разходки  
-- 7–9 часа сън  
-- Почивка след работа  
+- Сън 7–9 часа  
 """,
 """
 ## 🪑 Ergonomics
 - Correct posture  
 - Eye-level monitor  
 - Comfortable chair  
-- No slouching  
 
 ## ⏱ Rhythm
 - Break every 45–60 min  
-- 50/10 cycles  
-- Task splitting  
+- Work/rest balance  
 
 ## 🧠 Mental health
-- No multitasking  
-- Single focus  
+- Single task focus  
 - Reduce notifications  
 
 ## 🌿 Recovery
 - Walks  
 - 7–9h sleep  
-- Rest after work  
 """))
