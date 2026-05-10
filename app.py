@@ -65,18 +65,18 @@ emotion_responses = {
 }
 
 # =========================
-# 🔥 FIXED DARK MODE (ONLY ADDITION)
+# 🔥 ONLY FIX: FORCE DARK MODE (SAFE ADDITION)
 # =========================
 st.markdown("""
 <style>
 
-/* FULL DARK BACKGROUND (FOR ALL DEVICES) */
+/* FULL APP DARK BACKGROUND (ALL DEVICES FIX) */
 html, body, .stApp {
     background-color: #0e1117 !important;
     color: #ffffff !important;
 }
 
-/* FORCE ALL TEXT WHITE */
+/* FORCE TEXT VISIBILITY */
 * {
     color: #ffffff !important;
 }
@@ -84,11 +84,6 @@ html, body, .stApp {
 /* MAIN CONTAINER */
 .block-container {
     background-color: #0e1117 !important;
-}
-
-/* HEADER LINES */
-hr {
-    border-color: #2a2f3a !important;
 }
 
 /* SIDEBAR */
@@ -117,11 +112,21 @@ section[data-testid="stSidebar"] {
     color: #ffffff !important;
 }
 
+/* HEADERS */
+h1, h2, h3, h4 {
+    color: #ffffff !important;
+}
+
 /* INPUTS */
 input, textarea, select {
     background-color: #1a1f2e !important;
     color: #ffffff !important;
     border: 1px solid #333 !important;
+}
+
+/* LINE SEPARATOR */
+hr {
+    border-color: #2a2f3a !important;
 }
 
 /* DATAFRAME */
