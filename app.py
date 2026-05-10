@@ -25,7 +25,7 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
-# DATA (EMPLOYEES / DEPARTMENTS)
+# DATA
 # =========================
 employees = ["Employee A", "Employee B", "Employee C", "Employee D"]
 
@@ -38,44 +38,29 @@ departments = [
 ]
 
 # =========================
-# EMOTIONAL RESPONSES
+# EMOTIONAL ENGINE
 # =========================
 emotion_responses = {
     "Good": [
-        "Днес си в стабилен и продуктивен ритъм.",
-        "Енергията ти е подредена и спокойна.",
-        "Това е ден, в който нещата се случват естествено.",
+        "Днес си в стабилен и лек ритъм.",
+        "Енергията ти е подредена и ясна.",
         "Добър баланс между фокус и спокойствие.",
-        "Стабилността ти е силна основа за резултати.",
-        "Работиш в добър синхрон със себе си.",
-        "Ясен и лек работен поток.",
-        "Добър ден за дългосрочен прогрес.",
-        "Спокойна ефективност — най-добрият тип продуктивност.",
-        "Всичко ти е на място днес."
+        "Стабилна продуктивност без напрежение.",
+        "Ден, в който нещата се случват естествено."
     ],
     "Neutral": [
         "Спокоен и равен ден.",
-        "Нищо крайно — и това е окей.",
-        "Балансът е стабилна основа.",
-        "Ден за подреждане и яснота.",
-        "Тих работен ритъм.",
-        "Неутралното състояние също е прогрес.",
-        "Добър момент за фокус.",
-        "Стабилен, но спокоен ден.",
-        "Без напрежение — без излишен шум.",
-        "Рутинен, но полезен ден."
+        "Нормален ритъм — и това е добре.",
+        "Тихо, без напрежение.",
+        "Баланс без крайности.",
+        "Стабилна основа за работа."
     ],
     "Bad": [
         "Труден момент — но временен.",
-        "Не си сам в това състояние.",
-        "Почивката е правилният ход.",
-        "Намали темпото за момент.",
-        "Това ще премине.",
-        "Дишай и продължи по-късно.",
+        "Дай си пауза.",
+        "Намали темпото.",
         "Не носи всичко сам.",
-        "Това е сигнал, не край.",
-        "Позволи си пауза.",
-        "По-лек ритъм днес е правилният избор."
+        "Това ще отмине."
     ]
 }
 
@@ -91,7 +76,7 @@ menu = st.sidebar.radio(
         t("Въвеждане", "Check-in"),
         t("AI анализ", "AI Insights"),
         t("Данни", "Data"),
-        t("Здравословна работа", "Wellbeing Guide")
+        t("Work & Mind Balance", "Work & Mind Balance")
     ]
 )
 
@@ -119,61 +104,24 @@ if menu == t("Табло", "Dashboard"):
     data = st.session_state.data
 
     if len(data) == 0:
-        st.info(t("Няма данни", "No data yet"))
-
+        st.info(t("Няма данни", "No data"))
     else:
 
         moods = [d["mood"] for d in data]
         energy = [d["energy"] for d in data]
 
-        good = moods.count("Good")
-        neutral = moods.count("Neutral")
-        bad = moods.count("Bad")
-
-        avg_energy = sum(energy) / len(energy)
-
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Entries", len(data))
-        col2.metric("Good", good)
-        col3.metric("Bad", bad)
-        col4.metric("Energy", f"{avg_energy:.1f}")
+        col2.metric("Good", moods.count("Good"))
+        col3.metric("Bad", moods.count("Bad"))
+        col4.metric("Energy", f"{sum(energy)/len(energy):.1f}")
 
         st.write("---")
 
         st.subheader(t("Тенденции", "Trends"))
 
-        last_7 = data[-7:]
-        last_30 = data[-30:]
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.write(t("Седмица", "Weekly"))
-            st.line_chart([d["energy"] for d in last_7] if last_7 else [])
-
-        with col2:
-            st.write(t("Месец", "Monthly"))
-            st.line_chart([d["energy"] for d in last_30] if last_30 else [])
-
-        st.write("---")
-
-        st.subheader(t("Здраве на екипите", "Team Health Score"))
-
-        dept_scores = {}
-
-        for dept in departments:
-            dept_data = [d for d in data if d["department"] == dept]
-
-            if len(dept_data) == 0:
-                score = 50
-            else:
-                avg = sum([d["energy"] for d in dept_data]) / len(dept_data)
-                bad_ratio = len([d for d in dept_data if d["mood"] == "Bad"]) / len(dept_data)
-                score = int((avg * 10) - (bad_ratio * 40))
-
-            dept_scores[dept] = score
-
-        st.bar_chart(dept_scores)
+        st.columns(2)[0].line_chart([d["energy"] for d in data[-7:]])
+        st.columns(2)[1].line_chart([d["energy"] for d in data[-30:]])
 
 # =========================================================
 # CHECK-IN
@@ -205,7 +153,7 @@ elif menu == t("Въвеждане", "Check-in"):
         st.info(random.choice(emotion_responses[mood]))
 
 # =========================================================
-# AI INSIGHTS (UPGRADED FINAL LOGIC)
+# AI INSIGHTS (IMPROVED FINAL LOGIC)
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
@@ -223,11 +171,10 @@ elif menu == t("AI анализ", "AI Insights"):
 
         st.subheader(t("HR интерпретация", "HR Interpretation"))
 
-        # 🔴 STRESS
         if bad_ratio > 0.4:
 
             st.error(t(
-                "Наблюдава се повишено напрежение в екипа.",
+                "Повишено напрежение в екипа.",
                 "Increased stress detected in the team."
             ))
 
@@ -236,77 +183,50 @@ elif menu == t("AI анализ", "AI Insights"):
 ### Препоръки:
 - Намаляване на натоварването  
 - Повече почивки  
-- 1:1 разговори с екипа  
-- Избягване на допълнителни задачи  
+- 1:1 разговори  
+- Изчистване на приоритети  
                 """,
                 """
 ### Recommendations:
 - Reduce workload  
-- Increase breaks  
+- More breaks  
 - 1:1 check-ins  
-- Avoid extra tasks  
+- Clarify priorities  
                 """
             ))
 
-            st.info(t(
-                "Фокус: възстановяване, не продуктивност.",
-                "Focus: recovery, not productivity."
-            ))
-
-        # 🟡 LOW ENERGY
         elif avg_energy < 5:
 
             st.warning(t(
-                "Наблюдава се спад в енергията.",
+                "Спад в енергията.",
                 "Energy levels are declining."
             ))
 
             st.markdown(t(
                 """
 ### Препоръки:
-- По-лек работен ритъм  
+- По-лек ритъм  
 - Кратки почивки  
-- Приоритизация на задачи  
+- Фокус върху основното  
                 """,
                 """
 ### Recommendations:
 - Lighter workload  
 - Short breaks  
-- Task prioritization  
+- Focus on essentials  
                 """
             ))
 
-        # 🟢 STABLE (IMPROVED MOTIVATION)
         else:
 
             st.success(t(
-                "Екипът показва стабилно и здравословно състояние.",
-                "The team shows a stable and healthy state."
-            ))
-
-            st.markdown(t(
-                """
-### Положителни сигнали:
-- Балансирано натоварване  
-- Добра емоционална стабилност  
-- Устойчив работен ритъм  
-                """,
-                """
-### Positive signals:
-- Balanced workload  
-- Good emotional stability  
-- Sustainable workflow  
-                """
+                "Стабилно и здравословно състояние.",
+                "Stable and healthy team condition."
             ))
 
             st.info(t(
-                "Продължете текущия подход — той работи добре.",
+                "Продължете текущия подход — работи добре.",
                 "Continue current approach — it works well."
-            ))
-
-            st.markdown(t(
-                "💡 Стабилността е най-силният индикатор за дългосрочен успех.",
-                "💡 Stability is the strongest indicator of long-term success."
             ))
 
 # =========================================================
@@ -322,21 +242,71 @@ elif menu == t("Данни", "Data"):
         st.dataframe(st.session_state.data, use_container_width=True)
 
 # =========================================================
-# WELLBEING GUIDE
+# WELLBEING (RESTORED + ENHANCED)
 # =========================================================
-elif menu == t("Здравословна работа", "Wellbeing Guide"):
+elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
-    st.title(t("Здравословна работа", "Wellbeing Guide"))
+    st.title(t("Баланс работа и ум", "Work & Mind Balance"))
 
-    st.write(t(
+    st.markdown(t(
         """
-- Почивки на 45–60 мин  
-- Правилна стойка  
-- Баланс работа/почивка  
+## 🪑 Ергономия
+- Поддържай правилна стойка  
+- Монитор на нивото на очите  
+- Стол с добра опора  
+- Не работи приведен дълго  
+
+## ⏱ Ритъм на работа
+- Почивки на 45–60 минути  
+- 50/10 работен цикъл  
+- Разделяй задачите на малки части  
+- Не работи без пауза дълго време  
+
+## 🧠 Ментално здраве
+- Не мултитасквай постоянно  
+- Дай си “тихо време” без чатове  
+- Намали известията  
+- Фокус върху една задача  
+
+## 🌿 Възстановяване
+- Разходки през деня  
+- Достатъчен сън (7–9 часа)  
+- Излизане от работната среда след работа  
+- Време без екран  
+
+## 🔥 Продуктивност без изгаряне
+- По-бавно = по-качествено  
+- Почивката е част от работата  
+- Балансът създава резултат  
 """,
         """
+## 🪑 Ergonomics
+- Keep correct posture  
+- Screen at eye level  
+- Proper chair support  
+- Avoid long slouching  
+
+## ⏱ Work rhythm
 - Break every 45–60 min  
-- Proper posture  
-- Work-life balance  
+- 50/10 work cycles  
+- Split tasks into small steps  
+- Don’t work without pause  
+
+## 🧠 Mental health
+- Avoid constant multitasking  
+- Silent focus time  
+- Reduce notifications  
+- Single-task focus  
+
+## 🌿 Recovery
+- Walk during the day  
+- Sleep 7–9 hours  
+- Disconnect after work  
+- Screen-free time  
+
+## 🔥 Sustainable productivity
+- Slower = higher quality  
+- Rest is part of work  
+- Balance creates results  
 """
     ))
