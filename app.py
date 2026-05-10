@@ -2,9 +2,12 @@ import streamlit as st
 from datetime import datetime
 
 # =========================
-# CONFIG
+# PAGE CONFIG
 # =========================
-st.set_page_config(page_title="Inner Compass HR", layout="wide")
+st.set_page_config(
+    page_title="Inner Compass — AI Wellbeing & HR Intelligence",
+    layout="wide"
+)
 
 # =========================
 # DATA STORAGE
@@ -13,47 +16,59 @@ if "data" not in st.session_state:
     st.session_state.data = []
 
 # =========================
-# LANGUAGE SYSTEM
+# SIDEBAR BRANDING
 # =========================
-lang = st.sidebar.selectbox("Language / Език", ["Български", "English"])
+st.sidebar.markdown("## Inner Compass")
+st.sidebar.caption("AI Wellbeing & HR Intelligence")
 
-def t(bg, en):
-    return bg if lang == "Български" else en
-
-# =========================
-# SIDEBAR NAVIGATION
-# =========================
 menu = st.sidebar.radio(
-    t("Навигация", "Navigation"),
-    [
-        t("Табло", "Dashboard"),
-        t("Въвеждане", "Check-in"),
-        t("AI анализ", "AI Insights"),
-        t("Данни", "Data"),
-        t("Здравословна работа", "Wellbeing Guide")
-    ]
+    "Navigation",
+    ["Dashboard", "Check-in", "AI Insights", "Data", "Wellbeing Guide"]
 )
 
 # =========================
 # EMPLOYEES / DEPARTMENTS
 # =========================
-employees = ["Employee A", "Employee B", "Employee C"]
-departments = ["Development", "Marketing", "Sales"]
+employees = ["Employee A", "Employee B", "Employee C", "Employee D"]
+
+departments = [
+    "Human Resources (HR)",
+    "Development",
+    "Operations",
+    "Support",
+    "Management"
+]
 
 # =========================
+# GLOBAL HEADER (PERSISTENT BRAND)
+# =========================
+st.markdown(
+    """
+    <h1 style='text-align:center; margin-bottom:5px;'>
+    Inner Compass
+    </h1>
+    <h4 style='text-align:center; color:gray; margin-top:0px;'>
+    AI Wellbeing & HR Intelligence Platform
+    </h4>
+    <hr>
+    """,
+    unsafe_allow_html=True
+)
+
+# =========================================================
 # DASHBOARD
-# =========================
-if menu == t("Табло", "Dashboard"):
+# =========================================================
+if menu == "Dashboard":
 
-    st.title(t("HR Табло за управление", "HR Dashboard"))
+    st.title("HR Dashboard")
 
     data = st.session_state.data
 
     if len(data) == 0:
-        st.info(t("Няма данни още, но структурата на системата е активна.", "No data yet, but system is active."))
+        st.info("No data yet. System is ready for input.")
 
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Total", "0")
+        col1.metric("Entries", "0")
         col2.metric("Good", "0")
         col3.metric("Bad", "0")
         col4.metric("Avg Energy", "0")
@@ -71,43 +86,43 @@ if menu == t("Табло", "Dashboard"):
 
         col1, col2, col3, col4 = st.columns(4)
 
-        col1.metric(t("Записи", "Entries"), len(data))
-        col2.metric(t("Добро", "Good"), good)
-        col3.metric(t("Лошо", "Bad"), bad)
-        col4.metric(t("Енергия", "Energy"), f"{avg_energy:.1f}")
+        col1.metric("Entries", len(data))
+        col2.metric("Good Mood", good)
+        col3.metric("Bad Mood", bad)
+        col4.metric("Avg Energy", f"{avg_energy:.1f}")
 
         st.write("---")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader(t("Енергийна тенденция", "Energy Trend"))
+            st.subheader("Energy Trend")
             st.line_chart(energy)
 
         with col2:
-            st.subheader(t("Настроение", "Mood"))
+            st.subheader("Mood Distribution")
             st.bar_chart({
                 "Good": good,
                 "Neutral": neutral,
                 "Bad": bad
             })
 
-# =========================
+# =========================================================
 # CHECK-IN
-# =========================
-elif menu == t("Въвеждане", "Check-in"):
+# =========================================================
+elif menu == "Check-in":
 
-    st.title(t("Дневно въвеждане", "Daily Check-in"))
+    st.title("Daily Check-in")
 
-    employee = st.selectbox(t("Служител", "Employee"), employees)
-    department = st.selectbox(t("Отдел", "Department"), departments)
+    employee = st.selectbox("Employee", employees)
+    department = st.selectbox("Department", departments)
 
-    mood = st.radio(t("Настроение", "Mood"), ["Good", "Neutral", "Bad"])
-    energy = st.slider(t("Енергия", "Energy"), 1, 10, 5)
+    mood = st.radio("Mood", ["Good", "Neutral", "Bad"])
+    energy = st.slider("Energy level", 1, 10, 5)
 
-    note = st.text_input(t("Бележка", "Note"))
+    note = st.text_input("Note (optional)")
 
-    if st.button(t("Запази", "Save")):
+    if st.button("Save"):
         st.session_state.data.append({
             "time": datetime.now(),
             "employee": employee,
@@ -116,25 +131,26 @@ elif menu == t("Въвеждане", "Check-in"):
             "energy": energy,
             "note": note
         })
-        st.success(t("Записано", "Saved"))
+        st.success("Saved successfully")
 
     st.write("---")
-    st.subheader(t("Последни записи", "Recent entries"))
+
+    st.subheader("Recent Entries")
 
     for d in st.session_state.data[-8:]:
         st.write(f"{d['time'].strftime('%Y-%m-%d %H:%M')} | {d['employee']} | {d['mood']} | {d['energy']}")
 
-# =========================
+# =========================================================
 # AI INSIGHTS
-# =========================
-elif menu == t("AI анализ", "AI Insights"):
+# =========================================================
+elif menu == "AI Insights":
 
-    st.title(t("AI HR анализ", "AI HR Analysis"))
+    st.title("AI HR Intelligence")
 
     data = st.session_state.data
 
     if len(data) == 0:
-        st.info(t("Няма данни за анализ", "No data to analyze"))
+        st.info("No data available")
     else:
 
         bad_ratio = len([d for d in data if d["mood"] == "Bad"]) / len(data)
@@ -143,119 +159,71 @@ elif menu == t("AI анализ", "AI Insights"):
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader(t("Наблюдение", "Observation"))
+            st.subheader("Observation")
 
             if bad_ratio > 0.4:
-                st.error(t("Повишено напрежение", "High stress detected"))
+                st.error("High stress detected in team")
             elif avg_energy < 5:
-                st.warning(t("Ниска енергия", "Low energy detected"))
+                st.warning("Low energy detected")
             else:
-                st.success(t("Стабилно състояние", "Stable condition"))
+                st.success("Stable team condition")
 
         with col2:
-            st.subheader(t("Анализ", "Insight"))
+            st.subheader("AI Analysis")
 
             if bad_ratio > 0.4:
-                st.write(t(
-                    "Вероятно има натрупване на стрес.",
-                    "Likely accumulated stress in team."
-                ))
-                st.write(t(
-                    "Препоръка: намаляване на натоварването.",
-                    "Recommendation: reduce workload."
-                ))
+                st.write("Likely workload stress accumulation.")
+                st.write("Recommendation: reduce workload pressure.")
             elif avg_energy < 5:
-                st.write(t(
-                    "Възможна умора.",
-                    "Possible fatigue."
-                ))
-                st.write(t(
-                    "Препоръка: повече почивки.",
-                    "Recommendation: more breaks."
-                ))
+                st.write("Possible fatigue or overload.")
+                st.write("Recommendation: introduce recovery time.")
             else:
-                st.write(t(
-                    "Няма проблемни модели.",
-                    "No risk patterns detected."
-                ))
+                st.write("No risk patterns detected.")
 
-# =========================
-# DATA VIEW
-# =========================
-elif menu == t("Данни", "Data"):
+# =========================================================
+# DATA
+# =========================================================
+elif menu == "Data":
 
-    st.title(t("HR данни", "HR Data"))
+    st.title("HR Data")
 
     if len(st.session_state.data) == 0:
-        st.info(t("Няма данни", "No data"))
+        st.info("No records yet")
     else:
         st.dataframe(st.session_state.data, use_container_width=True)
 
-# =========================
+# =========================================================
 # WELLBEING GUIDE
-# =========================
-elif menu == t("Здравословна работа", "Wellbeing Guide"):
+# =========================================================
+elif menu == "Wellbeing Guide":
 
-    st.title(t("Златни правила за здравословна работа", "Healthy Work Guidelines"))
+    st.title("Workplace Wellbeing Guide")
 
-    st.write(t("## 🪑 Ергономия", "## 🪑 Ergonomics"))
-
-    st.write(t("""
-- Дръж гърба изправен  
-- Почивка на всеки 45–60 минути  
-- Екран на нивото на очите  
-- Удобен стол е задължителен  
-""",
-"""
+    st.write("## Ergonomics")
+    st.write("""
 - Keep back straight  
-- Break every 45–60 min  
+- Take breaks every 45–60 minutes  
 - Screen at eye level  
-- Use ergonomic chair  
-"""))
+- Use proper chair support  
+""")
 
-    st.write("---")
+    st.write("## Mental Health")
+    st.write("""
+- Avoid nonstop work without breaks  
+- Focus on one task at a time  
+- Communicate stress early  
+""")
 
-    st.write(t("## 🧠 Психично здраве", "## 🧠 Mental Health"))
-
-    st.write(t("""
-- Не работи без почивки  
-- Фокус върху една задача  
-- Не трупай стрес  
-- Говори с екипа  
-""",
-"""
-- Take regular breaks  
-- Focus on one task  
-- Do not accumulate stress  
-- Communicate with team  
-"""))
-
-    st.write("---")
-
-    st.write(t("## ⏱ Работа и фокус", "## ⏱ Focus & Work"))
-
-    st.write(t("""
-- 50 мин работа / 10 мин почивка  
-- Най-важната задача първо  
-- Минимизирай разсейването  
-""",
-"""
-- 50 min work / 10 min break  
-- Do important task first  
+    st.write("## Work Balance")
+    st.write("""
+- 50 min work / 10 min break cycles  
+- Prioritize tasks  
 - Reduce distractions  
-"""))
+""")
 
-    st.write("---")
-
-    st.write(t("## 🌿 Баланс", "## 🌿 Balance"))
-
-    st.write(t("""
-- Почивка след работа  
-- Разходки  
-- 7–9 часа сън  
-""",
-"""
+    st.write("## Recovery")
+    st.write("""
 - Disconnect after work  
-- Walks and movement  
-- 7–9 hours sleep  
-"""))
+- Walk daily  
+- Sleep 7–9 hours  
+""")
