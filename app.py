@@ -1,14 +1,10 @@
 import streamlit as st
 from datetime import datetime
-import random
 
 # =========================
 # CONFIG
 # =========================
-st.set_page_config(page_title="Inner Compass HR", page_icon="Compass", layout="centered")
-
-st.title("Inner Compass HR Platform")
-st.subheader("Система за анализ на благосъстоянието в екипа")
+st.set_page_config(page_title="Inner Compass HR", page_icon="Compass", layout="wide")
 
 # =========================
 # DATA STORAGE
@@ -17,151 +13,129 @@ if "data" not in st.session_state:
     st.session_state.data = []
 
 # =========================
-# ORGANIZATIONAL STRUCTURE
+# SIDEBAR MENU
 # =========================
-st.write("## Служител и отдел")
-
-department = st.selectbox(
-    "Избери отдел:",
-    ["Разработка", "Маркетинг", "Продажби"]
-)
-
-employee = st.selectbox(
-    "Избери служител:",
-    ["Служител A", "Служител B", "Служител C", "Служител D"]
+menu = st.sidebar.selectbox(
+    "Навигация",
+    ["Въвеждане на данни", "Анализи", "AI препоръки", "HR Данни"]
 )
 
 # =========================
-# CHECK-IN
+# EMPLOYEES + DEPARTMENTS
 # =========================
-st.write("## Дневно състояние")
+employees = ["Employee A", "Employee B", "Employee C", "Employee D"]
+departments = ["Разработка", "Маркетинг", "Продажби"]
 
-mood = st.radio(
-    "Настроение:",
-    ["Добро", "Нормално", "Лошо"]
-)
+# =========================================================
+# 1. INPUT PAGE
+# =========================================================
+if menu == "Въвеждане на данни":
 
-energy = st.slider("Енергия (1–10)", 1, 10, 5)
+    st.title("Въвеждане на дневно състояние")
 
-note = st.text_input("Коментар (по избор)")
+    employee = st.selectbox("Служител", employees)
+    department = st.selectbox("Отдел", departments)
 
-if st.button("Запази данни"):
-    entry = {
-        "time": datetime.now(),
-        "department": department,
-        "employee": employee,
-        "mood": mood,
-        "energy": energy,
-        "note": note
-    }
-    st.session_state.data.append(entry)
-    st.success("Данните са записани успешно")
+    mood = st.radio("Настроение", ["Добро", "Нормално", "Лошо"])
+    energy = st.slider("Енергия (1-10)", 1, 10, 5)
+    note = st.text_input("Бележка (по избор)")
 
-# =========================
-# FILTER DATA
-# =========================
-dept_data = [d for d in st.session_state.data if d["department"] == department]
-emp_data = [d for d in dept_data if d["employee"] == employee]
+    if st.button("Запази"):
+        st.session_state.data.append({
+            "time": datetime.now(),
+            "employee": employee,
+            "department": department,
+            "mood": mood,
+            "energy": energy,
+            "note": note
+        })
+        st.success("Записано успешно")
 
-# =========================
-# PERSONAL VIEW
-# =========================
-st.write("## Лична история")
+    st.write("---")
+    st.write("Последни записи")
 
-if len(emp_data) == 0:
-    st.info("Няма данни за този служител.")
-else:
-    for d in emp_data[-10:]:
-        st.write(f"{d['time'].strftime('%Y-%m-%d %H:%M')} | {d['mood']} | Енергия: {d['energy']}")
-        if d["note"]:
-            st.write(f"Бележка: {d['note']}")
+    for d in st.session_state.data[-10:]:
+        st.write(f"{d['time'].strftime('%Y-%m-%d %H:%M')} | {d['employee']} | {d['mood']} | {d['energy']}")
 
-# =========================
-# WEEKLY ANALYSIS
-# =========================
-st.write("## Седмичен анализ")
+# =========================================================
+# 2. ANALYTICS PAGE
+# =========================================================
+elif menu == "Анализи":
 
-weekly_scores = {"Добро": 3, "Нормално": 2, "Лошо": 1}
+    st.title("Анализи на екипа")
 
-if len(emp_data) >= 3:
-    values = [weekly_scores[d["mood"]] for d in emp_data[-7:]]
-    st.line_chart(values)
-else:
-    st.info("Няма достатъчно данни за седмичен анализ")
-
-# =========================
-# MONTHLY ANALYSIS
-# =========================
-st.write("## Месечен анализ")
-
-if len(emp_data) >= 5:
-    values = [weekly_scores[d["mood"]] for d in emp_data]
-    st.line_chart(values)
-else:
-    st.info("Няма достатъчно данни за месечен анализ")
-
-# =========================
-# TEAM OVERVIEW
-# =========================
-st.write("## Преглед на екипа")
-
-if len(dept_data) > 0:
-    moods = [d["mood"] for d in dept_data]
-
-    good = moods.count("Добро")
-    neutral = moods.count("Нормално")
-    bad = moods.count("Лошо")
-
-    total = len(moods)
-
-    st.write(f"Добро: {good}")
-    st.write(f"Нормално: {neutral}")
-    st.write(f"Лошо: {bad}")
-
-    avg_energy = sum([d["energy"] for d in dept_data]) / total
-    st.write(f"Средна енергия: {avg_energy:.1f}")
-
-# =========================
-# AI ANALYSIS ENGINE
-# =========================
-st.write("## AI анализ на състоянието")
-
-if len(dept_data) > 0:
-    bad_ratio = sum([1 for d in dept_data if d["mood"] == "Лошо"]) / len(dept_data)
-    avg_energy = sum([d["energy"] for d in dept_data]) / len(dept_data)
-
-    st.write("### Наблюдение")
-
-    if bad_ratio > 0.4:
-        st.warning("Засилено напрежение в отдела.")
-    elif avg_energy < 5:
-        st.warning("Ниска енергия в екипа.")
+    if len(st.session_state.data) == 0:
+        st.info("Няма данни")
     else:
-        st.success("Стабилно състояние в отдела.")
 
-    st.write("### Причина (AI анализ)")
+        moods = [d["mood"] for d in st.session_state.data]
 
-    if bad_ratio > 0.4:
-        st.write("Вероятно има натрупване на работно напрежение или стресови периоди.")
-    elif avg_energy < 5:
-        st.write("Възможно е умора или недостатъчна почивка.")
+        good = moods.count("Добро")
+        neutral = moods.count("Нормално")
+        bad = moods.count("Лошо")
+
+        st.write("### Общо състояние")
+        st.write(f"Добро: {good}")
+        st.write(f"Нормално: {neutral}")
+        st.write(f"Лошо: {bad}")
+
+        avg_energy = sum([d["energy"] for d in st.session_state.data]) / len(st.session_state.data)
+        st.write(f"Средна енергия: {avg_energy:.1f}")
+
+        st.write("---")
+        st.write("### Графика (енергия)")
+
+        st.line_chart([d["energy"] for d in st.session_state.data])
+
+# =========================================================
+# 3. AI INSIGHTS PAGE
+# =========================================================
+elif menu == "AI препоръки":
+
+    st.title("AI HR анализ")
+
+    if len(st.session_state.data) == 0:
+        st.info("Няма данни за анализ")
     else:
-        st.write("Няма видими проблемни модели в момента.")
 
-    st.write("### Препоръка")
+        bad_ratio = len([d for d in st.session_state.data if d["mood"] == "Лошо"]) / len(st.session_state.data)
+        avg_energy = sum([d["energy"] for d in st.session_state.data]) / len(st.session_state.data)
 
-    if bad_ratio > 0.4:
-        st.write("Препоръчва се намаляване на натоварването и кратки почивки.")
-    elif avg_energy < 5:
-        st.write("Препоръчва се оптимизация на работния ритъм.")
+        st.write("### Наблюдение")
+
+        if bad_ratio > 0.4:
+            st.warning("Засилено напрежение в екипа")
+        elif avg_energy < 5:
+            st.warning("Ниска енергия в екипа")
+        else:
+            st.success("Стабилно състояние")
+
+        st.write("### Причина")
+
+        if bad_ratio > 0.4:
+            st.write("Вероятно има натрупване на стрес и работно напрежение.")
+        elif avg_energy < 5:
+            st.write("Възможна умора или претоварване.")
+        else:
+            st.write("Няма негативни модели в момента.")
+
+        st.write("### Препоръка")
+
+        if bad_ratio > 0.4:
+            st.write("Намалете натоварването и добавете почивки.")
+        elif avg_energy < 5:
+            st.write("Оптимизирайте работния ритъм.")
+        else:
+            st.write("Поддържайте текущия баланс.")
+
+# =========================================================
+# 4. HR DATA PAGE
+# =========================================================
+elif menu == "HR Данни":
+
+    st.title("HR данни (всички записи)")
+
+    if len(st.session_state.data) == 0:
+        st.info("Няма данни")
     else:
-        st.write("Поддържайте текущия баланс.")
-else:
-    st.info("Няма достатъчно данни за анализ")
-
-# =========================
-# RAW DATA (HR VIEW)
-# =========================
-st.write("## Данни (HR достъп)")
-
-st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data)
