@@ -25,61 +25,6 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
-# 🌿 SAFE CALM UI (FIXED CONTRAST)
-# =========================
-st.markdown("""
-<style>
-
-/* background */
-.stApp {
-    background: linear-gradient(135deg, #eaf4f0 0%, #f3f6fb 50%, #eef6f1 100%);
-}
-
-/* FIX TEXT VISIBILITY (IMPORTANT) */
-html, body, [class*="css"] {
-    color: #1f2d3d !important;
-}
-
-/* headings */
-h1, h2, h3 {
-    color: #1f2d3d !important;
-}
-
-/* normal text */
-p, span, label {
-    color: #2b3a4a !important;
-}
-
-/* metric cards */
-div[data-testid="stMetric"] {
-    background: rgba(255,255,255,0.85);
-    border-radius: 16px;
-    padding: 12px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-
-/* sidebar */
-section[data-testid="stSidebar"] {
-    background: rgba(255,255,255,0.75);
-}
-
-/* buttons */
-.stButton > button {
-    border-radius: 10px;
-    border: none;
-    background: #2f6f5e;
-    color: white;
-    padding: 0.4rem 1rem;
-}
-
-.stButton > button:hover {
-    background: #245648;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
 # DATA
 # =========================
 employees = ["Employee A", "Employee B", "Employee C", "Employee D"]
@@ -105,10 +50,10 @@ emotion_responses = {
     ],
     "Neutral": [
         "Спокоен, равен ден.",
-        "Без крайности.",
-        "Стабилен ритъм.",
-        "Нормален работен ден.",
-        "Балансът е окей."
+        "Нормален ритъм.",
+        "Баланс без крайности.",
+        "Тих работен ден.",
+        "Стабилно състояние."
     ],
     "Bad": [
         "Труден момент — ще отмине.",
@@ -134,22 +79,19 @@ menu = st.sidebar.radio(
 )
 
 # =========================
-# HEADER
+# HEADER (CLEAN)
 # =========================
-st.markdown("""
-<div style='text-align:center; padding:10px 0 20px 0;'>
-    <h1>Inner Compass</h1>
-    <p style='color:#4f5f6f;'>AI HR & Wellbeing Intelligence Platform</p>
-</div>
-<hr style='opacity:0.3'>
-""", unsafe_allow_html=True)
+st.title("Inner Compass")
+st.caption("AI HR & Wellbeing Intelligence Platform")
+
+st.write("---")
 
 # =========================================================
 # DASHBOARD
 # =========================================================
 if menu == t("Табло", "Dashboard"):
 
-    st.title(t("HR Табло", "HR Dashboard"))
+    st.header(t("HR Табло", "HR Dashboard"))
 
     data = st.session_state.data
 
@@ -186,7 +128,7 @@ if menu == t("Табло", "Dashboard"):
 # =========================================================
 elif menu == t("Въвеждане", "Check-in"):
 
-    st.title(t("Дневно въвеждане", "Daily Check-in"))
+    st.header(t("Дневно въвеждане", "Daily Check-in"))
 
     employee = st.selectbox(t("Служител", "Employee"), employees)
     department = st.selectbox(t("Отдел", "Department"), departments)
@@ -214,7 +156,7 @@ elif menu == t("Въвеждане", "Check-in"):
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
-    st.title("AI HR Intelligence")
+    st.header("AI HR Intelligence")
 
     data = st.session_state.data
 
@@ -229,7 +171,7 @@ elif menu == t("AI анализ", "AI Insights"):
 
             st.error(t(
                 "Повишено напрежение в екипа.",
-                "Increased stress detected."
+                "Increased stress detected in the team."
             ))
 
             st.write(t(
@@ -266,7 +208,7 @@ elif menu == t("AI анализ", "AI Insights"):
 # =========================================================
 elif menu == t("Данни", "Data"):
 
-    st.title(t("HR данни", "HR Data"))
+    st.header(t("HR данни", "HR Data"))
 
     if len(st.session_state.data) == 0:
         st.info(t("Няма данни", "No data"))
@@ -278,41 +220,41 @@ elif menu == t("Данни", "Data"):
 # =========================================================
 elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
-    st.title(t("Баланс ум и работа", "Work & Mind Balance"))
+    st.header(t("Баланс работа и ум", "Work & Mind Balance"))
 
     st.markdown(t("""
-## 🪑 Ергономия
+## Ергономия
 - Правилна стойка  
 - Монитор на нивото на очите  
 - Удобен стол  
 
-## ⏱ Ритъм
+## Ритъм на работа
 - Почивки на 45–60 мин  
 - Баланс работа/почивка  
 
-## 🧠 Ментално здраве
+## Ментално здраве
 - Фокус върху една задача  
-- Без излишни известия  
+- Намаляване на известия  
 
-## 🌿 Възстановяване
+## Възстановяване
 - Разходки  
 - Сън 7–9 часа  
 """,
 """
-## 🪑 Ergonomics
+## Ergonomics
 - Correct posture  
 - Eye-level monitor  
 - Comfortable chair  
 
-## ⏱ Rhythm
+## Work rhythm
 - Break every 45–60 min  
-- Work/rest balance  
+- Work-life balance  
 
-## 🧠 Mental health
-- Single-task focus  
+## Mental health
+- Single task focus  
 - Reduce notifications  
 
-## 🌿 Recovery
+## Recovery
 - Walks  
 - 7–9h sleep  
 """))
