@@ -1,254 +1,89 @@
 import streamlit as st
 from datetime import datetime
-import random
 
 # =========================
 # CONFIG
 # =========================
-st.set_page_config(
-    page_title="Inner Compass",
-    page_icon="🏛️",
-    layout="wide"
+st.set_page_config(page_title="Inner Compass HR", page_icon="🧭", layout="centered")
+
+st.title("🧭 Inner Compass")
+st.subheader("HR Wellbeing Check-in")
+
+# =========================
+# DATA STORAGE (simple in memory)
+# =========================
+if "mood_history" not in st.session_state:
+    st.session_state.mood_history = []
+
+# =========================
+# USER INPUT (EMPLOYEE CHECK-IN)
+# =========================
+st.write("### Как се чувстваш днес?")
+
+mood = st.radio(
+    "Избери настроение:",
+    ["😄 Добре", "😐 Нормално", "😔 Зле"]
 )
 
-# =========================
-# STATE
-# =========================
-if "history" not in st.session_state:
-    st.session_state.history = []
+energy = st.slider("Енергия (1 = ниска, 10 = висока)", 1, 10, 5)
+
+note = st.text_input("(по желание) Какво влияе на настроението ти?")
+
+if st.button("Запази"):
+    entry = {
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "mood": mood,
+        "energy": energy,
+        "note": note
+    }
+    st.session_state.mood_history.append(entry)
+    st.success("Запазено успешно!")
 
 # =========================
-# LANGUAGE
+# HISTORY VIEW (EMPLOYEE)
 # =========================
-lang = st.selectbox("Language", ["Български", "English"])
+st.write("---")
+st.write("### Твоята история")
 
-def t(bg, en):
-    return bg if lang == "Български" else en
-
-# =========================
-# STYLE
-# =========================
-st.markdown("""
-<style>
-html, body {
-    font-family: Inter, system-ui, sans-serif;
-    background: #020617;
-    color: #e2e8f0;
-}
-
-.stTextInput input {
-    font-size: 20px !important;
-    height: 60px !important;
-}
-
-h1 { text-align: center; }
-</style>
-""", unsafe_allow_html=True)
+if len(st.session_state.mood_history) == 0:
+    st.info("Още няма данни.")
+else:
+    for item in reversed(st.session_state.mood_history[-10:]):
+        st.write(f"{item['time']} | {item['mood']} | Енергия: {item['energy']}")
+        if item["note"]:
+            st.write(f"👉 {item['note']}")
 
 # =========================
-# HEADER
+# SIMPLE HR ANALYTICS (TEAM VIEW SIMULATION)
 # =========================
-st.markdown("<h1>Inner Compass</h1>", unsafe_allow_html=True)
+st.write("---")
+st.write("### 📊 Общо състояние (симулация)")
 
-st.markdown(
-    f"<p style='text-align:center; opacity:0.7;'>"
-    f"⟡ {t('Продължаваме заедно... по-смирени, по-смислени, по-стоически', 'We continue together... more calm, more meaningful, more stoic')} ⟡"
-    f"</p>",
-    unsafe_allow_html=True
-)
+if len(st.session_state.mood_history) > 0:
+    moods = [m["mood"] for m in st.session_state.mood_history]
 
-st.markdown("---")
+    happy = moods.count("😄 Добре")
+    neutral = moods.count("😐 Нормално")
+    sad = moods.count("😔 Зле")
 
-# =========================
-# EMOTION KEYWORDS
-# =========================
-RECOVERY = ["уморен","изморен","изтощен","капнал","изчерпан","нямам сила","прегорял"]
-STRESS = ["стрес","напрежение","хаос","паника","натиск","притеснен","пренатоварен"]
-SAD = ["тъжен","сам","болка","разбит","отчаян","потиснат"]
-ANGER = ["ядосан","гневен","бесен","раздразнен","кипя"]
-WORK = ["работа","deadline","задачи","график","натоварен"]
-INSPO = ["щастлив","радост","вдъхновен","усмихнат","добре ми е"]
-NEUTRAL = ["ок","нормално","спокойно","баланс","без промяна"]
+    total = len(moods)
 
-def match(words, text):
-    return any(w in text for w in words)
+    st.write(f"😄 Добре: {happy}/{total}")
+    st.write(f"😐 Нормално: {neutral}/{total}")
+    st.write(f"😔 Зле: {sad}/{total}")
 
-def detect(text):
-    ttxt = text.lower()
+    avg_energy = sum([m["energy"] for m in st.session_state.mood_history]) / total
+    st.write(f"⚡ Средна енергия: {avg_energy:.1f}")
 
-    if match(RECOVERY, ttxt): return "recovery"
-    if match(STRESS, ttxt): return "stress"
-    if match(SAD, ttxt): return "sad"
-    if match(ANGER, ttxt): return "anger"
-    if match(WORK, ttxt): return "work"
-    if match(INSPO, ttxt): return "inspiration"
-    return "neutral"
+    # simple AI-like insight
+    st.write("---")
+    st.write("### 🧠 AI Insight")
 
-# =========================
-# RESPONSES
-# =========================
-RESPONSES = {
-"recovery":[
-"Тялото ти показва нужда от възстановяване. Това е естествен сигнал за баланс, не слабост.",
-"Изтощението означава, че ресурсите ти са използвани. Сега е момент за пауза и презареждане.",
-"Понякога прогресът изглежда като спиране, но всъщност е възстановяване.",
-"Когато системата е уморена, намаляването на темпото е правилният избор.",
-"Това състояние показва нужда от вътрешен рестарт."
-],
-
-"stress":[
-"Напрежението показва претоварване на мисленето. Това не е липса на способност, а прекалено много входяща информация.",
-"Стресът идва, когато всичко изглежда еднакво важно. Фокусът връща контрол.",
-"Това състояние е сигнал за ментално претоварване.",
-"Не е нужно да реагираш на всичко наведнъж.",
-"Пауза създава повече яснота от усилие."
-],
-
-"sad":[
-"Това е състояние на вътрешна тежест, която изисква време, не натиск.",
-"Емоционалната болка е процес, който се разгръща постепенно.",
-"Приемането намалява вътрешното напрежение.",
-"Това състояние е валидно и временно.",
-"Разбирането е първата форма на облекчение."
-],
-
-"anger":[
-"Гневът е енергия, която търси посока.",
-"Между реакция и действие има пространство.",
-"Това състояние показва натрупано напрежение.",
-"Пауза променя резултата.",
-"Гневът е сигнал, не решение."
-],
-
-"work":[
-"Работното натоварване влияе на яснотата при липса на структура.",
-"Фокусът е по-важен от количеството задачи.",
-"Това състояние показва нужда от приоритизация.",
-"Прекалено много задачи разпиляват вниманието.",
-"Редът създава ефективност."
-],
-
-"inspiration":[
-"Това е състояние на яснота и вътрешен импулс.",
-"Вдъхновението трябва да бъде насочено.",
-"Когато умът е подреден, действията са естествени.",
-"Това е вътрешна синхронизация.",
-"Импулсът е начало, структурата е резултат."
-],
-
-"neutral":[
-"Стабилно състояние без доминираща емоция.",
-"Това е баланс между вътрешни процеси.",
-"Яснота без емоционален шум.",
-"Добра основа за решения.",
-"Неутралността е стабилност."
-]
-}
-
-# =========================
-# ANALYSIS
-# =========================
-CATEGORY_LABELS = {
-"recovery":"Възстановяване",
-"stress":"Напрежение",
-"sad":"Емоционална тежест",
-"anger":"Реактивност",
-"work":"Работно натоварване",
-"inspiration":"Мотивация",
-"neutral":"Баланс"
-}
-
-CATEGORY_DESC = {
-"recovery":"Намалена енергия и нужда от възстановяване.",
-"stress":"Повишено вътрешно напрежение и претоварване.",
-"sad":"Емоционална тежест и вътрешна чувствителност.",
-"anger":"Висока реактивност и напрежение.",
-"work":"Натоварване от задачи и фокус.",
-"inspiration":"Яснота, мотивация и движение.",
-"neutral":"Стабилно и балансирано състояние."
-}
-
-STOIC = {
-"recovery":"„Почивката е част от пътя.“",
-"stress":"„Не събитията, а нашата интерпретация.“ – Епиктет",
-"sad":"„Приемането носи спокойствие.“",
-"anger":"„Между реакция и действие има свобода.“",
-"work":"„Фокусът създава ред.“ – Сенека",
-"inspiration":"„Ясният ум създава движение.“",
-"neutral":"„Стабилността е основа на действие.“"
-}
-
-# =========================
-# LAYOUT
-# =========================
-left, center, right = st.columns([1,3,1.2])
-
-# =========================
-# ANALYSIS PANEL
-# =========================
-with left:
-    st.markdown("### 🧠 Анализ")
-
-    counts = {}
-    for h in st.session_state.history:
-        counts[h["emotion"]] = counts.get(h["emotion"],0)+1
-
-    for k,v in counts.items():
-        st.write(f"{CATEGORY_LABELS[k]}: {v}")
-
-    st.markdown("---")
-
-    if counts:
-        dom = max(counts, key=counts.get)
-
-        st.markdown("### 📊 Обобщение")
-        st.write(CATEGORY_DESC[dom])
-
-        st.markdown("### 🏛️ Стоическа перспектива")
-        st.write(STOIC[dom])
-
-# =========================
-# CHAT
-# =========================
-with center:
-
-    st.markdown("### Как се чувстваш?")
-
-    with st.form("form", clear_on_submit=True):
-        text = st.text_input("Сподели състояние...")
-        send = st.form_submit_button("Изпрати")
-
-        if send and text:
-            emo = detect(text)
-            st.session_state.history.append({
-                "time": datetime.now().strftime("%H:%M"),
-                "text": text,
-                "emotion": emo
-            })
-
-    st.markdown("---")
-
-    for h in reversed(st.session_state.history):
-        st.markdown(f"**{h['time']} · {h['text']}**")
-        st.info(random.choice(RESPONSES[h["emotion"]]))
-
-# =========================
-# WELL-BEING (FIXED EXPANDERS RESTORED)
-# =========================
-with right:
-    st.markdown("### 🧘 Well-being")
-
-    with st.expander("⟡ Дишане"):
-        st.write("Контролираното дишане намалява стреса и стабилизира нервната система. Само няколко минути могат да върнат яснотата.")
-
-    with st.expander("⟡ Фокус"):
-        st.write("Фокусът означава работа върху една задача без разпиляване. Това е основа на ефективността.")
-
-    with st.expander("⟡ Движение"):
-        st.write("Лекото движение подобрява кръвообращението и намалява напрежението.")
-
-    with st.expander("⟡ Хидратация"):
-        st.write("Водата влияе директно върху концентрацията и енергията.")
-
-    with st.expander("⟡ Почивка"):
-        st.write("Почивката не прекъсва прогреса — тя го поддържа устойчив.")
+    if sad > happy:
+        st.warning("Забелязва се по-високо напрежение в данните. Възможен риск от натоварване.")
+    elif avg_energy < 5:
+        st.warning("Енергията е ниска. Възможно е екипът да е уморен.")
+    else:
+        st.success("Състоянието изглежда стабилно и балансирано.")
+else:
+    st.info("Няма достатъчно данни за анализ.")
