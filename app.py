@@ -17,7 +17,7 @@ if "data" not in st.session_state:
     st.session_state.data = []
 
 # =========================
-# LANGUAGE SYSTEM
+# LANGUAGE SYSTEM (GLOBAL FIX)
 # =========================
 lang = st.sidebar.selectbox("Language / Език", ["Български", "English"])
 
@@ -28,7 +28,7 @@ def t(bg, en):
 # SIDEBAR
 # =========================
 st.sidebar.markdown("## Inner Compass")
-st.sidebar.caption("AI Wellbeing & HR Intelligence")
+st.sidebar.caption(t("AI Wellbeing & HR Intelligence", "AI Wellbeing & HR Intelligence"))
 
 menu = st.sidebar.radio(
     t("Навигация", "Navigation"),
@@ -47,21 +47,21 @@ menu = st.sidebar.radio(
 employees = ["Employee A", "Employee B", "Employee C", "Employee D"]
 
 departments = [
-    "Human Resources (HR)",
-    "Development",
-    "Operations",
-    "Support",
-    "Management"
+    t("Човешки ресурси", "Human Resources"),
+    t("Разработка", "Development"),
+    t("Операции", "Operations"),
+    t("Поддръжка", "Support"),
+    t("Управление", "Management")
 ]
 
 # =========================
-# HEADER
+# HEADER (FULL TRANSLATED)
 # =========================
 st.markdown(
-    """
+    f"""
     <h1 style='text-align:center;'>Inner Compass</h1>
     <h4 style='text-align:center; color:gray;'>
-    AI Wellbeing & HR Intelligence Platform
+    {t("AI Платформа за благосъстояние и HR анализ", "AI Wellbeing & HR Intelligence Platform")}
     </h4>
     <hr>
     """,
@@ -69,7 +69,7 @@ st.markdown(
 )
 
 # =========================================================
-# DASHBOARD (UPGRADED: WEEKLY + MONTHLY + TEAM SCORE)
+# DASHBOARD (UPGRADED UI + FULL TRANSLATION)
 # =========================================================
 if menu == t("Табло", "Dashboard"):
 
@@ -78,7 +78,7 @@ if menu == t("Табло", "Dashboard"):
     data = st.session_state.data
 
     if len(data) == 0:
-        st.info(t("Няма данни още", "No data yet"))
+        st.info(t("Няма данни все още", "No data yet"))
 
     else:
 
@@ -94,34 +94,34 @@ if menu == t("Табло", "Dashboard"):
         # =========================
         # KPI CARDS
         # =========================
-        col1, col2, col3, col4 = st.columns(4)
+        c1, c2, c3, c4 = st.columns(4)
 
-        col1.metric("Entries", len(data))
-        col2.metric("Good", good)
-        col3.metric("Bad", bad)
-        col4.metric("Avg Energy", f"{avg_energy:.1f}")
+        c1.metric(t("Записи", "Entries"), len(data))
+        c2.metric(t("Добро", "Good"), good)
+        c3.metric(t("Лошо", "Bad"), bad)
+        c4.metric(t("Енергия", "Energy"), f"{avg_energy:.1f}")
 
         st.write("---")
 
         # =========================
-        # WEEK / MONTH VIEW (SIMPLIFIED)
+        # TRENDS (FULL TRANSLATED)
         # =========================
         st.subheader(t("Тенденции", "Trends"))
 
-        last_7 = data[-7:] if len(data) >= 7 else data
-        last_30 = data[-30:] if len(data) >= 30 else data
+        last_7 = data[-7:]
+        last_30 = data[-30:]
 
         col1, col2 = st.columns(2)
 
         with col1:
-            st.write(t("Седмица", "Weekly"))
+            st.write(t("Седмична енергия", "Weekly Energy"))
             if len(last_7) > 0:
                 st.line_chart([d["energy"] for d in last_7])
             else:
                 st.info("-")
 
         with col2:
-            st.write(t("Месец", "Monthly"))
+            st.write(t("Месечна енергия", "Monthly Energy"))
             if len(last_30) > 0:
                 st.line_chart([d["energy"] for d in last_30])
             else:
@@ -130,13 +130,14 @@ if menu == t("Табло", "Dashboard"):
         st.write("---")
 
         # =========================
-        # TEAM HEALTH SCORE (NEW)
+        # TEAM HEALTH SCORE (TRANSLATED LABELS)
         # =========================
-        st.subheader("Team Health Score")
+        st.subheader(t("Здраве на екипите", "Team Health Score"))
 
         dept_scores = {}
 
         for dept in departments:
+
             dept_data = [d for d in data if d["department"] == dept]
 
             if len(dept_data) == 0:
@@ -152,7 +153,7 @@ if menu == t("Табло", "Dashboard"):
         st.bar_chart(dept_scores)
 
 # =========================================================
-# CHECK-IN (UNCHANGED LOGIC)
+# CHECK-IN (UNCHANGED LOGIC, FIXED TEXTS)
 # =========================================================
 elif menu == t("Въвеждане", "Check-in"):
 
@@ -179,9 +180,8 @@ elif menu == t("Въвеждане", "Check-in"):
 
         st.success(t("Записано успешно", "Saved successfully"))
 
-        # small emotional feedback (safe minimal)
         st.info(t(
-            "Благодарим ти за споделянето.",
+            "Благодарим за споделянето.",
             "Thank you for sharing."
         ))
 
@@ -192,7 +192,7 @@ elif menu == t("Въвеждане", "Check-in"):
         st.write(f"{d['time'].strftime('%Y-%m-%d %H:%M')} | {d['employee']} | {d['mood']} | {d['energy']}")
 
 # =========================================================
-# AI INSIGHTS (UPGRADED HUMAN HR STYLE)
+# AI INSIGHTS (FULL HUMAN HR STYLE + TRANSLATION FIX)
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
@@ -209,14 +209,13 @@ elif menu == t("AI анализ", "AI Insights"):
 
         st.subheader(t("HR интерпретация", "HR Interpretation"))
 
-        # HUMAN HR STYLE (NEW)
         if bad_ratio > 0.4:
             st.error(t(
-                "В екипа се наблюдава повишено напрежение и емоционално натоварване.",
-                "The team shows increased stress and emotional load."
+                "Наблюдава се повишено натоварване и напрежение в екипа.",
+                "Increased stress and workload detected in the team."
             ))
             st.write(t(
-                "Препоръка: облекчаване на натоварването и повече почивки.",
+                "Препоръка: намаляване на натоварването и повече възстановяване.",
                 "Recommendation: reduce workload and increase recovery time."
             ))
 
@@ -232,12 +231,8 @@ elif menu == t("AI анализ", "AI Insights"):
 
         else:
             st.success(t(
-                "Екипът показва стабилно психо-емоционално състояние.",
-                "The team shows stable emotional state."
-            ))
-            st.write(t(
-                "Продължете текущия ритъм на работа.",
-                "Maintain current workflow."
+                "Екипът показва стабилно състояние.",
+                "The team shows stable performance and emotional balance."
             ))
 
 # =========================================================
@@ -257,33 +252,28 @@ elif menu == t("Данни", "Data"):
 # =========================================================
 elif menu == t("Здравословна работа", "Wellbeing Guide"):
 
-    st.title(t("Златни правила", "Wellbeing Guide"))
+    st.title(t("Здравословна работа", "Workplace Wellbeing"))
 
-    st.write("## 🪑 Ergonomics")
-    st.write("""
-- Straight posture  
+    st.write("## 🪑 " + t("Ергономия", "Ergonomics"))
+    st.write(t("""
+- Правилна стойка  
+- Почивки на 45–60 мин  
+- Удобен стол  
+""",
+"""
+- Correct posture  
 - Break every 45–60 min  
-- Eye-level screen  
-- Comfortable chair  
-""")
+- Ergonomic chair  
+"""))
 
-    st.write("## 🧠 Mental Health")
-    st.write("""
+    st.write("## 🧠 " + t("Психично здраве", "Mental Health"))
+    st.write(t("""
+- Почивки  
+- Фокус  
+- Без пренатоварване  
+""",
+"""
 - Take breaks  
-- Single-task focus  
+- Focus  
 - Avoid overload  
-""")
-
-    st.write("## ⏱ Work Balance")
-    st.write("""
-- 50/10 cycles  
-- Prioritize tasks  
-- Reduce distractions  
-""")
-
-    st.write("## 🌿 Recovery")
-    st.write("""
-- Walks  
-- 7–9h sleep  
-- Disconnect after work  
-""")
+"""))
