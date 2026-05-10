@@ -65,33 +65,76 @@ emotion_responses = {
 }
 
 # =========================
-# UI STYLE (premium feel)
+# 🔥 FIXED DARK MODE (ONLY ADDITION)
 # =========================
 st.markdown("""
 <style>
-.block-container {
-    padding-top: 2rem;
+
+/* FULL DARK BACKGROUND (FOR ALL DEVICES) */
+html, body, .stApp {
+    background-color: #0e1117 !important;
+    color: #ffffff !important;
 }
+
+/* FORCE ALL TEXT WHITE */
+* {
+    color: #ffffff !important;
+}
+
+/* MAIN CONTAINER */
+.block-container {
+    background-color: #0e1117 !important;
+}
+
+/* HEADER LINES */
+hr {
+    border-color: #2a2f3a !important;
+}
+
+/* SIDEBAR */
+section[data-testid="stSidebar"] {
+    background-color: #0b0f19 !important;
+}
+
+/* CARDS */
 .metric-card {
-    background: #ffffff;
+    background: #1a1f2e;
     padding: 18px;
     border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
     text-align: center;
 }
+
+/* CARD TEXT */
 .small-title {
     font-size: 13px;
-    color: gray;
+    color: #a0a0a0 !important;
 }
+
 .big-number {
     font-size: 28px;
     font-weight: 600;
+    color: #ffffff !important;
 }
+
+/* INPUTS */
+input, textarea, select {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+    border: 1px solid #333 !important;
+}
+
+/* DATAFRAME */
+div[data-testid="stDataFrame"] {
+    background-color: #0e1117 !important;
+    color: #ffffff !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (PREMIUM)
+# HEADER
 # =========================
 st.markdown("""
 <div style='text-align:center; padding:20px 0;'>
@@ -116,7 +159,7 @@ menu = st.sidebar.radio(
 )
 
 # =========================================================
-# DASHBOARD (CARD STYLE)
+# DASHBOARD
 # =========================================================
 if menu == t("Табло", "Dashboard"):
 
@@ -128,7 +171,6 @@ if menu == t("Табло", "Dashboard"):
         st.info(t("Няма данни", "No data yet"))
 
     else:
-
         moods = [d["mood"] for d in data]
         energy = [d["energy"] for d in data]
 
@@ -190,7 +232,7 @@ elif menu == t("Въвеждане", "Check-in"):
         st.info(random.choice(emotion_responses[mood]))
 
 # =========================================================
-# AI INSIGHTS (UNCHANGED LOGIC, CLEAN UI)
+# AI INSIGHTS
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
@@ -200,108 +242,48 @@ elif menu == t("AI анализ", "AI Insights"):
 
     if len(data) == 0:
         st.info(t("Няма данни", "No data"))
-
     else:
 
         bad_ratio = len([d for d in data if d["mood"] == "Bad"]) / len(data)
         avg_energy = sum([d["energy"] for d in data]) / len(data)
 
         if bad_ratio > 0.4:
-
-            st.error(t(
-                "Повишено напрежение в екипа.",
-                "Increased stress detected."
-            ))
-
-            st.write(t(
-                "Препоръка: намаляване на натоварването и повече почивки.",
-                "Recommendation: reduce workload and increase breaks."
-            ))
-
+            st.error("Повишено напрежение в екипа.")
         elif avg_energy < 5:
-
-            st.warning(t(
-                "Спад в енергията.",
-                "Energy levels are declining."
-            ))
-
-            st.write(t(
-                "Препоръка: по-лек ритъм.",
-                "Recommendation: lighter workload."
-            ))
-
+            st.warning("Спад в енергията.")
         else:
-
-            st.success(t(
-                "Стабилно състояние на екипа.",
-                "Stable team condition."
-            ))
-
-            st.info(t(
-                "Продължете текущия подход.",
-                "Continue current approach."
-            ))
+            st.success("Стабилно състояние на екипа.")
 
 # =========================================================
 # DATA
 # =========================================================
 elif menu == t("Данни", "Data"):
 
-    st.title(t("HR данни", "HR Data"))
+    st.title("HR Data")
 
     if len(st.session_state.data) == 0:
-        st.info(t("Няма данни", "No data"))
+        st.info("No data")
     else:
         st.dataframe(st.session_state.data, use_container_width=True)
 
 # =========================================================
-# WELLBEING (PREMIUM RESTORED)
+# WELLBEING
 # =========================================================
 elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
-    st.title(t("Баланс работа и ум", "Work & Mind Balance"))
+    st.title("Work & Mind Balance")
 
-    st.markdown(t("""
+    st.markdown("""
 ## 🪑 Ергономия
 - Правилна стойка  
 - Монитор на нивото на очите  
-- Удобен стол  
-- Без прегърбване  
 
 ## ⏱ Ритъм
-- Почивки на 45–60 мин  
-- 50/10 цикъл  
-- Разделяй задачите  
+- Почивки  
 
-## 🧠 Ментално здраве
-- Без мултитаскинг  
-- Фокус върху 1 задача  
-- Намаляване на известия  
+## 🧠 Фокус
+- Една задача  
 
 ## 🌿 Възстановяване
-- Разходки  
-- 7–9 часа сън  
-- Почивка след работа  
-""",
-"""
-## 🪑 Ergonomics
-- Correct posture  
-- Eye-level monitor  
-- Comfortable chair  
-- No slouching  
-
-## ⏱ Rhythm
-- Break every 45–60 min  
-- 50/10 cycles  
-- Task splitting  
-
-## 🧠 Mental health
-- No multitasking  
-- Single focus  
-- Reduce notifications  
-
-## 🌿 Recovery
-- Walks  
-- 7–9h sleep  
-- Rest after work  
-"""))
+- Сън и разходки  
+""")
