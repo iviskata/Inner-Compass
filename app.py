@@ -2,9 +2,12 @@ import streamlit as st
 from datetime import datetime
 
 # =========================
-# CONFIG
+# PAGE CONFIG (clean SaaS style)
 # =========================
-st.set_page_config(page_title="Inner Compass HR", layout="wide")
+st.set_page_config(
+    page_title="Inner Compass HR",
+    layout="wide"
+)
 
 # =========================
 # DATA STORAGE
@@ -13,83 +16,101 @@ if "data" not in st.session_state:
     st.session_state.data = []
 
 # =========================
-# SIDEBAR
+# SIDEBAR NAVIGATION
 # =========================
 menu = st.sidebar.radio(
-    "Навигация",
-    ["Dashboard", "Въвеждане", "AI анализ", "HR данни"]
+    "Navigation",
+    ["Dashboard", "Check-in", "AI Insights", "Data"]
 )
 
+# =========================
+# BASE DATA
+# =========================
 employees = ["Employee A", "Employee B", "Employee C"]
-departments = ["Разработка", "Маркетинг", "Продажби"]
+departments = ["Development", "Marketing", "Sales"]
 
-# =========================
-# DASHBOARD PAGE (MAIN VIEW)
-# =========================
+# =========================================================
+# DASHBOARD (PREMIUM VIEW)
+# =========================================================
 if menu == "Dashboard":
 
-    st.title("Inner Compass HR Dashboard")
+    st.markdown("# Inner Compass HR")
+
+    st.caption("Team wellbeing analytics platform")
 
     if len(st.session_state.data) == 0:
-        st.info("Няма данни за показване")
+        st.info("No data available yet.")
     else:
 
-        total = len(st.session_state.data)
+        data = st.session_state.data
+        total = len(data)
 
-        moods = [d["mood"] for d in st.session_state.data]
-        energy_values = [d["energy"] for d in st.session_state.data]
+        moods = [d["mood"] for d in data]
+        energy = [d["energy"] for d in data]
 
-        good = moods.count("Добро")
-        neutral = moods.count("Нормално")
-        bad = moods.count("Лошо")
+        good = moods.count("Good")
+        neutral = moods.count("Neutral")
+        bad = moods.count("Bad")
 
-        avg_energy = sum(energy_values) / total
+        avg_energy = sum(energy) / total
 
         # =========================
-        # KPI CARDS
+        # KPI CARDS (premium layout)
         # =========================
         col1, col2, col3, col4 = st.columns(4)
 
-        col1.metric("Общо записи", total)
-        col2.metric("Добро настроение", good)
-        col3.metric("Лошо настроение", bad)
-        col4.metric("Средна енергия", f"{avg_energy:.1f}")
+        with col1:
+            st.markdown("### Total Entries")
+            st.markdown(f"## {total}")
+
+        with col2:
+            st.markdown("### Positive Mood")
+            st.markdown(f"## {good}")
+
+        with col3:
+            st.markdown("### Negative Mood")
+            st.markdown(f"## {bad}")
+
+        with col4:
+            st.markdown("### Avg Energy")
+            st.markdown(f"## {avg_energy:.1f}")
 
         st.write("---")
 
         # =========================
-        # CHARTS
+        # CHARTS (clean layout)
         # =========================
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader("Енергия (тенденция)")
-            st.line_chart(energy_values)
+            st.markdown("### Energy Trend")
+            st.line_chart(energy)
 
         with col2:
-            st.subheader("Разпределение на настроение")
+            st.markdown("### Mood Distribution")
             st.bar_chart({
-                "Добро": good,
-                "Нормално": neutral,
-                "Лошо": bad
+                "Good": good,
+                "Neutral": neutral,
+                "Bad": bad
             })
 
-# =========================
-# INPUT PAGE
-# =========================
-elif menu == "Въвеждане":
+# =========================================================
+# CHECK-IN PAGE
+# =========================================================
+elif menu == "Check-in":
 
-    st.title("Дневно въвеждане")
+    st.markdown("# Daily Check-in")
+    st.caption("Log employee wellbeing data")
 
-    employee = st.selectbox("Служител", employees)
-    department = st.selectbox("Отдел", departments)
+    employee = st.selectbox("Employee", employees)
+    department = st.selectbox("Department", departments)
 
-    mood = st.radio("Настроение", ["Добро", "Нормално", "Лошо"])
-    energy = st.slider("Енергия", 1, 10, 5)
+    mood = st.radio("Mood", ["Good", "Neutral", "Bad"])
+    energy = st.slider("Energy level", 1, 10, 5)
 
-    note = st.text_input("Бележка")
+    note = st.text_input("Optional note")
 
-    if st.button("Запази"):
+    if st.button("Save"):
         st.session_state.data.append({
             "time": datetime.now(),
             "employee": employee,
@@ -98,62 +119,68 @@ elif menu == "Въвеждане":
             "energy": energy,
             "note": note
         })
-        st.success("Записано успешно")
+        st.success("Saved successfully")
 
     st.write("---")
-    st.subheader("Последни записи")
+
+    st.markdown("### Recent entries")
 
     for d in st.session_state.data[-8:]:
-        st.write(f"{d['time'].strftime('%Y-%m-%d %H:%M')} | {d['employee']} | {d['mood']} | {d['energy']}")
+        st.write(
+            f"{d['time'].strftime('%Y-%m-%d %H:%M')} | "
+            f"{d['employee']} | {d['mood']} | Energy: {d['energy']}"
+        )
 
-# =========================
-# AI ANALYSIS PAGE
-# =========================
-elif menu == "AI анализ":
+# =========================================================
+# AI INSIGHTS (clean consulting style)
+# =========================================================
+elif menu == "AI Insights":
 
-    st.title("AI HR анализ")
+    st.markdown("# AI Insights")
+    st.caption("System-generated wellbeing analysis")
 
     if len(st.session_state.data) == 0:
-        st.info("Няма данни")
+        st.info("No data to analyze.")
     else:
 
-        total = len(st.session_state.data)
-        bad_ratio = len([d for d in st.session_state.data if d["mood"] == "Лошо"]) / total
-        avg_energy = sum([d["energy"] for d in st.session_state.data]) / total
+        data = st.session_state.data
+        total = len(data)
+
+        bad_ratio = len([d for d in data if d["mood"] == "Bad"]) / total
+        avg_energy = sum([d["energy"] for d in data]) / total
 
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader("Наблюдение")
+            st.markdown("### Observation")
 
             if bad_ratio > 0.4:
-                st.error("Повишено напрежение в екипа")
+                st.error("Elevated stress levels detected")
             elif avg_energy < 5:
-                st.warning("Ниска енергия в екипа")
+                st.warning("Low energy levels detected")
             else:
-                st.success("Стабилно състояние")
+                st.success("Stable team condition")
 
         with col2:
-            st.subheader("AI интерпретация")
+            st.markdown("### Interpretation")
 
             if bad_ratio > 0.4:
-                st.write("Вероятно има натрупан стрес и претоварване.")
-                st.write("Препоръка: намаляване на натоварването.")
+                st.write("Likely workload accumulation or pressure increase.")
+                st.write("Recommended action: redistribute workload.")
             elif avg_energy < 5:
-                st.write("Възможна умора в екипа.")
-                st.write("Препоръка: оптимизация на работния ритъм.")
+                st.write("Possible fatigue or insufficient recovery.")
+                st.write("Recommended action: introduce recovery periods.")
             else:
-                st.write("Няма негативни модели в момента.")
-                st.write("Поддържайте текущия баланс.")
+                st.write("No significant risk patterns detected.")
 
-# =========================
-# HR DATA PAGE
-# =========================
-elif menu == "HR данни":
+# =========================================================
+# DATA PAGE (clean table view)
+# =========================================================
+elif menu == "Data":
 
-    st.title("HR база данни")
+    st.markdown("# HR Data")
 
     if len(st.session_state.data) == 0:
-        st.info("Няма данни")
+        st.info("No records available.")
     else:
-        st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True)
