@@ -6,61 +6,75 @@ from datetime import datetime
 # =========================
 st.set_page_config(page_title="Inner Compass HR", page_icon="🧭", layout="centered")
 
-st.title("🧭 Inner Compass")
-st.subheader("HR Wellbeing Check-in")
+st.title("🧭 Inner Compass HR Platform")
+st.subheader("Team Wellbeing System (MVP)")
 
 # =========================
-# DATA STORAGE (simple in memory)
+# TEAM DATA STORAGE
 # =========================
-if "mood_history" not in st.session_state:
-    st.session_state.mood_history = []
+if "team_data" not in st.session_state:
+    st.session_state.team_data = []
 
 # =========================
-# USER INPUT (EMPLOYEE CHECK-IN)
+# EMPLOYEE IDENTIFIER (SIMULATION)
+# =========================
+st.write("### 👤 Кой си днес (симулация на служител)")
+
+user = st.selectbox(
+    "Избери потребител:",
+    ["Иван", "Мария", "Георги", "Ани"]
+)
+
+# =========================
+# CHECK-IN
 # =========================
 st.write("### Как се чувстваш днес?")
 
 mood = st.radio(
-    "Избери настроение:",
+    "Настроение:",
     ["😄 Добре", "😐 Нормално", "😔 Зле"]
 )
 
-energy = st.slider("Енергия (1 = ниска, 10 = висока)", 1, 10, 5)
+energy = st.slider("Енергия (1–10)", 1, 10, 5)
 
-note = st.text_input("(по желание) Какво влияе на настроението ти?")
+note = st.text_input("Коментар (по желание)")
 
 if st.button("Запази"):
     entry = {
+        "user": user,
         "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "mood": mood,
         "energy": energy,
         "note": note
     }
-    st.session_state.mood_history.append(entry)
-    st.success("Запазено успешно!")
+    st.session_state.team_data.append(entry)
+    st.success("Запазено!")
 
 # =========================
-# HISTORY VIEW (EMPLOYEE)
+# PERSONAL HISTORY
 # =========================
 st.write("---")
-st.write("### Твоята история")
+st.write(f"### 📍 История на {user}")
 
-if len(st.session_state.mood_history) == 0:
-    st.info("Още няма данни.")
+user_entries = [x for x in st.session_state.team_data if x["user"] == user]
+
+if len(user_entries) == 0:
+    st.info("Още няма данни за този човек.")
 else:
-    for item in reversed(st.session_state.mood_history[-10:]):
-        st.write(f"{item['time']} | {item['mood']} | Енергия: {item['energy']}")
+    for item in reversed(user_entries[-10:]):
+        st.write(f"{item['time']} | {item['mood']} | ⚡ {item['energy']}")
         if item["note"]:
             st.write(f"👉 {item['note']}")
 
 # =========================
-# SIMPLE HR ANALYTICS (TEAM VIEW SIMULATION)
+# TEAM OVERVIEW (HR VIEW)
 # =========================
 st.write("---")
-st.write("### 📊 Общо състояние (симулация)")
+st.write("### 📊 Екипна картина")
 
-if len(st.session_state.mood_history) > 0:
-    moods = [m["mood"] for m in st.session_state.mood_history]
+if len(st.session_state.team_data) > 0:
+
+    moods = [m["mood"] for m in st.session_state.team_data]
 
     happy = moods.count("😄 Добре")
     neutral = moods.count("😐 Нормално")
@@ -72,18 +86,21 @@ if len(st.session_state.mood_history) > 0:
     st.write(f"😐 Нормално: {neutral}/{total}")
     st.write(f"😔 Зле: {sad}/{total}")
 
-    avg_energy = sum([m["energy"] for m in st.session_state.mood_history]) / total
-    st.write(f"⚡ Средна енергия: {avg_energy:.1f}")
+    avg_energy = sum([m["energy"] for m in st.session_state.team_data]) / total
+    st.write(f"⚡ Средна енергия на екипа: {avg_energy:.1f}")
 
-    # simple AI-like insight
+    # =========================
+    # SIMPLE HR INSIGHT ENGINE
+    # =========================
     st.write("---")
-    st.write("### 🧠 AI Insight")
+    st.write("### 🧠 HR Insight")
 
     if sad > happy:
-        st.warning("Забелязва се по-високо напрежение в данните. Възможен риск от натоварване.")
+        st.warning("Внимание: Повишено напрежение в екипа. Възможен риск от burnout.")
     elif avg_energy < 5:
-        st.warning("Енергията е ниска. Възможно е екипът да е уморен.")
+        st.warning("Екипът е с ниска енергия. Възможно е претоварване.")
     else:
-        st.success("Състоянието изглежда стабилно и балансирано.")
+        st.success("Екипът е в стабилно състояние.")
+
 else:
-    st.info("Няма достатъчно данни за анализ.")
+    st.info("Още няма екипни данни.")
