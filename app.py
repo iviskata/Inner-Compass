@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+import random
 
 # =========================
 # CONFIG
@@ -7,100 +8,135 @@ from datetime import datetime
 st.set_page_config(page_title="Inner Compass HR", page_icon="🧭", layout="centered")
 
 st.title("🧭 Inner Compass HR Platform")
-st.subheader("Team Wellbeing System (MVP)")
+st.subheader("Team Wellbeing Analytics")
 
 # =========================
-# TEAM DATA STORAGE
+# STORAGE
 # =========================
 if "team_data" not in st.session_state:
     st.session_state.team_data = []
 
 # =========================
-# EMPLOYEE IDENTIFIER (SIMULATION)
+# EMPLOYEES
 # =========================
-st.write("### 👤 Кой си днес (симулация на служител)")
+st.write("### 👤 Select Employee")
 
-user = st.selectbox(
-    "Избери потребител:",
-    ["Иван", "Мария", "Георги", "Ани"]
+employee = st.selectbox(
+    "Choose employee:",
+    ["Employee A", "Employee B", "Employee C"]
 )
 
 # =========================
 # CHECK-IN
 # =========================
-st.write("### Как се чувстваш днес?")
+st.write("### How are you feeling today?")
 
 mood = st.radio(
-    "Настроение:",
-    ["😄 Добре", "😐 Нормално", "😔 Зле"]
+    "Mood:",
+    ["😄 Good", "😐 Neutral", "😔 Bad"]
 )
 
-energy = st.slider("Енергия (1–10)", 1, 10, 5)
+energy = st.slider("Energy level", 1, 10, 5)
 
-note = st.text_input("Коментар (по желание)")
+note = st.text_input("Optional note")
 
-if st.button("Запази"):
+if st.button("Save check-in"):
     entry = {
-        "user": user,
-        "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "employee": employee,
+        "time": datetime.now(),
         "mood": mood,
-        "energy": energy,
-        "note": note
+        "energy": energy
     }
     st.session_state.team_data.append(entry)
-    st.success("Запазено!")
+    st.success("Saved!")
 
 # =========================
-# PERSONAL HISTORY
+# CONVERT MOOD TO SCORE
+# =========================
+def mood_score(m):
+    if m == "😄 Good":
+        return 3
+    elif m == "😐 Neutral":
+        return 2
+    return 1
+
+# =========================
+# FILTER EMPLOYEE DATA
+# =========================
+emp_data = [d for d in st.session_state.team_data if d["employee"] == employee]
+
+# =========================
+# PERSONAL VIEW
 # =========================
 st.write("---")
-st.write(f"### 📍 История на {user}")
+st.write(f"### 📍 {employee} History")
 
-user_entries = [x for x in st.session_state.team_data if x["user"] == user]
-
-if len(user_entries) == 0:
-    st.info("Още няма данни за този човек.")
+if len(emp_data) == 0:
+    st.info("No data yet.")
 else:
-    for item in reversed(user_entries[-10:]):
-        st.write(f"{item['time']} | {item['mood']} | ⚡ {item['energy']}")
-        if item["note"]:
-            st.write(f"👉 {item['note']}")
+    for d in emp_data[-10:]:
+        st.write(f"{d['time'].strftime('%Y-%m-%d %H:%M')} | {d['mood']} | ⚡ {d['energy']}")
 
 # =========================
-# TEAM OVERVIEW (HR VIEW)
+# WEEKLY ANALYSIS
 # =========================
 st.write("---")
-st.write("### 📊 Екипна картина")
+st.write("### 📅 Weekly Emotion Trend")
+
+if len(emp_data) >= 3:
+    week_scores = [mood_score(d["mood"]) for d in emp_data[-7:]]
+
+    st.line_chart(week_scores)
+else:
+    st.info("Not enough data for weekly trend (need at least 3 entries).")
+
+# =========================
+# MONTHLY ANALYSIS
+# =========================
+st.write("### 📆 Monthly Emotion Trend")
+
+if len(emp_data) >= 5:
+    month_scores = [mood_score(d["mood"]) for d in emp_data]
+
+    # simulate smoothing (grouping)
+    grouped = []
+    step = max(1, len(month_scores)//4)
+
+    for i in range(0, len(month_scores), step):
+        grouped.append(sum(month_scores[i:i+step]) / len(month_scores[i:i+step]))
+
+    st.line_chart(grouped)
+else:
+    st.info("Not enough data for monthly trend.")
+
+# =========================
+# TEAM OVERVIEW
+# =========================
+st.write("---")
+st.write("### 📊 Team Overview")
 
 if len(st.session_state.team_data) > 0:
+    all_moods = [d["mood"] for d in st.session_state.team_data]
 
-    moods = [m["mood"] for m in st.session_state.team_data]
+    good = all_moods.count("😄 Good")
+    neutral = all_moods.count("😐 Neutral")
+    bad = all_moods.count("😔 Bad")
 
-    happy = moods.count("😄 Добре")
-    neutral = moods.count("😐 Нормално")
-    sad = moods.count("😔 Зле")
+    st.write(f"😄 Good: {good}")
+    st.write(f"😐 Neutral: {neutral}")
+    st.write(f"😔 Bad: {bad}")
 
-    total = len(moods)
+    avg_energy = sum([d["energy"] for d in st.session_state.team_data]) / len(st.session_state.team_data)
+    st.write(f"⚡ Avg energy: {avg_energy:.1f}")
 
-    st.write(f"😄 Добре: {happy}/{total}")
-    st.write(f"😐 Нормално: {neutral}/{total}")
-    st.write(f"😔 Зле: {sad}/{total}")
-
-    avg_energy = sum([m["energy"] for m in st.session_state.team_data]) / total
-    st.write(f"⚡ Средна енергия на екипа: {avg_energy:.1f}")
-
-    # =========================
-    # SIMPLE HR INSIGHT ENGINE
-    # =========================
     st.write("---")
-    st.write("### 🧠 HR Insight")
+    st.write("### 🧠 Insight Engine")
 
-    if sad > happy:
-        st.warning("Внимание: Повишено напрежение в екипа. Възможен риск от burnout.")
+    if bad > good:
+        st.warning("Increased stress detected in team. Possible burnout risk.")
     elif avg_energy < 5:
-        st.warning("Екипът е с ниска енергия. Възможно е претоварване.")
+        st.warning("Low energy levels detected across team.")
     else:
-        st.success("Екипът е в стабилно състояние.")
-
+        st.success("Team state is stable and balanced.")
 else:
-    st.info("Още няма екипни данни.")
+    st.info("No team data yet.")
