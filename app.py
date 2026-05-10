@@ -43,32 +43,67 @@ departments = [
 emotion_responses = {
     "Good": [
         "Днес си в стабилен и лек ритъм.",
-        "Енергията ти е подредена и ясна.",
+        "Енергията ти е подредена.",
         "Добър баланс между фокус и спокойствие.",
         "Стабилна продуктивност без напрежение.",
-        "Ден, в който нещата се случват естествено."
+        "Всичко ти е на място днес."
     ],
     "Neutral": [
         "Спокоен и равен ден.",
-        "Нормален ритъм — и това е добре.",
-        "Тихо, без напрежение.",
-        "Баланс без крайности.",
-        "Стабилна основа за работа."
+        "Нищо крайно — и това е окей.",
+        "Балансът е стабилен.",
+        "Тих работен ритъм.",
+        "Неутрално състояние."
     ],
     "Bad": [
         "Труден момент — но временен.",
-        "Дай си пауза.",
-        "Намали темпото.",
-        "Не носи всичко сам.",
-        "Това ще отмине."
+        "Дишай и забави темпото.",
+        "Не си сам в това.",
+        "Това ще премине.",
+        "Почивката е правилният ход."
     ]
 }
 
 # =========================
+# UI STYLE (premium feel)
+# =========================
+st.markdown("""
+<style>
+.block-container {
+    padding-top: 2rem;
+}
+.metric-card {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+.small-title {
+    font-size: 13px;
+    color: gray;
+}
+.big-number {
+    font-size: 28px;
+    font-weight: 600;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
+# HEADER (PREMIUM)
+# =========================
+st.markdown("""
+<div style='text-align:center; padding:20px 0;'>
+    <h1>Inner Compass</h1>
+    <p style='color:gray;'>AI HR & Wellbeing Intelligence Platform</p>
+</div>
+<hr>
+""", unsafe_allow_html=True)
+
+# =========================
 # SIDEBAR
 # =========================
-st.sidebar.title("Inner Compass")
-
 menu = st.sidebar.radio(
     t("Навигация", "Navigation"),
     [
@@ -80,22 +115,8 @@ menu = st.sidebar.radio(
     ]
 )
 
-# =========================
-# HEADER
-# =========================
-st.markdown(
-    f"""
-    <h1 style='text-align:center;'>Inner Compass</h1>
-    <h4 style='text-align:center; color:gray;'>
-    {t("AI платформа за HR и благосъстояние", "AI HR & Wellbeing Platform")}
-    </h4>
-    <hr>
-    """,
-    unsafe_allow_html=True
-)
-
 # =========================================================
-# DASHBOARD
+# DASHBOARD (CARD STYLE)
 # =========================================================
 if menu == t("Табло", "Dashboard"):
 
@@ -104,24 +125,41 @@ if menu == t("Табло", "Dashboard"):
     data = st.session_state.data
 
     if len(data) == 0:
-        st.info(t("Няма данни", "No data"))
+        st.info(t("Няма данни", "No data yet"))
+
     else:
 
         moods = [d["mood"] for d in data]
         energy = [d["energy"] for d in data]
 
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Entries", len(data))
-        col2.metric("Good", moods.count("Good"))
-        col3.metric("Bad", moods.count("Bad"))
-        col4.metric("Energy", f"{sum(energy)/len(energy):.1f}")
+
+        with col1:
+            st.markdown(f"<div class='metric-card'><div class='small-title'>Entries</div><div class='big-number'>{len(data)}</div></div>", unsafe_allow_html=True)
+
+        with col2:
+            st.markdown(f"<div class='metric-card'><div class='small-title'>Good</div><div class='big-number'>{moods.count('Good')}</div></div>", unsafe_allow_html=True)
+
+        with col3:
+            st.markdown(f"<div class='metric-card'><div class='small-title'>Bad</div><div class='big-number'>{moods.count('Bad')}</div></div>", unsafe_allow_html=True)
+
+        with col4:
+            avg = sum(energy)/len(energy)
+            st.markdown(f"<div class='metric-card'><div class='small-title'>Energy</div><div class='big-number'>{avg:.1f}</div></div>", unsafe_allow_html=True)
 
         st.write("---")
 
         st.subheader(t("Тенденции", "Trends"))
 
-        st.columns(2)[0].line_chart([d["energy"] for d in data[-7:]])
-        st.columns(2)[1].line_chart([d["energy"] for d in data[-30:]])
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.write(t("Седмица", "Weekly"))
+            st.line_chart([d["energy"] for d in data[-7:]])
+
+        with col2:
+            st.write(t("Месец", "Monthly"))
+            st.line_chart([d["energy"] for d in data[-30:]])
 
 # =========================================================
 # CHECK-IN
@@ -135,7 +173,6 @@ elif menu == t("Въвеждане", "Check-in"):
 
     mood = st.radio(t("Настроение", "Mood"), ["Good", "Neutral", "Bad"])
     energy = st.slider(t("Енергия", "Energy"), 1, 10, 5)
-
     note = st.text_input(t("Бележка", "Note"))
 
     if st.button(t("Запази", "Save")):
@@ -153,7 +190,7 @@ elif menu == t("Въвеждане", "Check-in"):
         st.info(random.choice(emotion_responses[mood]))
 
 # =========================================================
-# AI INSIGHTS (IMPROVED FINAL LOGIC)
+# AI INSIGHTS (UNCHANGED LOGIC, CLEAN UI)
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
@@ -169,30 +206,16 @@ elif menu == t("AI анализ", "AI Insights"):
         bad_ratio = len([d for d in data if d["mood"] == "Bad"]) / len(data)
         avg_energy = sum([d["energy"] for d in data]) / len(data)
 
-        st.subheader(t("HR интерпретация", "HR Interpretation"))
-
         if bad_ratio > 0.4:
 
             st.error(t(
                 "Повишено напрежение в екипа.",
-                "Increased stress detected in the team."
+                "Increased stress detected."
             ))
 
-            st.markdown(t(
-                """
-### Препоръки:
-- Намаляване на натоварването  
-- Повече почивки  
-- 1:1 разговори  
-- Изчистване на приоритети  
-                """,
-                """
-### Recommendations:
-- Reduce workload  
-- More breaks  
-- 1:1 check-ins  
-- Clarify priorities  
-                """
+            st.write(t(
+                "Препоръка: намаляване на натоварването и повече почивки.",
+                "Recommendation: reduce workload and increase breaks."
             ))
 
         elif avg_energy < 5:
@@ -202,31 +225,21 @@ elif menu == t("AI анализ", "AI Insights"):
                 "Energy levels are declining."
             ))
 
-            st.markdown(t(
-                """
-### Препоръки:
-- По-лек ритъм  
-- Кратки почивки  
-- Фокус върху основното  
-                """,
-                """
-### Recommendations:
-- Lighter workload  
-- Short breaks  
-- Focus on essentials  
-                """
+            st.write(t(
+                "Препоръка: по-лек ритъм.",
+                "Recommendation: lighter workload."
             ))
 
         else:
 
             st.success(t(
-                "Стабилно и здравословно състояние.",
-                "Stable and healthy team condition."
+                "Стабилно състояние на екипа.",
+                "Stable team condition."
             ))
 
             st.info(t(
-                "Продължете текущия подход — работи добре.",
-                "Continue current approach — it works well."
+                "Продължете текущия подход.",
+                "Continue current approach."
             ))
 
 # =========================================================
@@ -242,71 +255,53 @@ elif menu == t("Данни", "Data"):
         st.dataframe(st.session_state.data, use_container_width=True)
 
 # =========================================================
-# WELLBEING (RESTORED + ENHANCED)
+# WELLBEING (PREMIUM RESTORED)
 # =========================================================
 elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
     st.title(t("Баланс работа и ум", "Work & Mind Balance"))
 
-    st.markdown(t(
-        """
+    st.markdown(t("""
 ## 🪑 Ергономия
-- Поддържай правилна стойка  
+- Правилна стойка  
 - Монитор на нивото на очите  
-- Стол с добра опора  
-- Не работи приведен дълго  
+- Удобен стол  
+- Без прегърбване  
 
-## ⏱ Ритъм на работа
-- Почивки на 45–60 минути  
-- 50/10 работен цикъл  
-- Разделяй задачите на малки части  
-- Не работи без пауза дълго време  
+## ⏱ Ритъм
+- Почивки на 45–60 мин  
+- 50/10 цикъл  
+- Разделяй задачите  
 
 ## 🧠 Ментално здраве
-- Не мултитасквай постоянно  
-- Дай си “тихо време” без чатове  
-- Намали известията  
-- Фокус върху една задача  
+- Без мултитаскинг  
+- Фокус върху 1 задача  
+- Намаляване на известия  
 
 ## 🌿 Възстановяване
-- Разходки през деня  
-- Достатъчен сън (7–9 часа)  
-- Излизане от работната среда след работа  
-- Време без екран  
-
-## 🔥 Продуктивност без изгаряне
-- По-бавно = по-качествено  
-- Почивката е част от работата  
-- Балансът създава резултат  
+- Разходки  
+- 7–9 часа сън  
+- Почивка след работа  
 """,
-        """
+"""
 ## 🪑 Ergonomics
-- Keep correct posture  
-- Screen at eye level  
-- Proper chair support  
-- Avoid long slouching  
+- Correct posture  
+- Eye-level monitor  
+- Comfortable chair  
+- No slouching  
 
-## ⏱ Work rhythm
+## ⏱ Rhythm
 - Break every 45–60 min  
-- 50/10 work cycles  
-- Split tasks into small steps  
-- Don’t work without pause  
+- 50/10 cycles  
+- Task splitting  
 
 ## 🧠 Mental health
-- Avoid constant multitasking  
-- Silent focus time  
+- No multitasking  
+- Single focus  
 - Reduce notifications  
-- Single-task focus  
 
 ## 🌿 Recovery
-- Walk during the day  
-- Sleep 7–9 hours  
-- Disconnect after work  
-- Screen-free time  
-
-## 🔥 Sustainable productivity
-- Slower = higher quality  
-- Rest is part of work  
-- Balance creates results  
-"""
-    ))
+- Walks  
+- 7–9h sleep  
+- Rest after work  
+"""))
