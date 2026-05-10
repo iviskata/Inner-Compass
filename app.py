@@ -17,7 +17,7 @@ if "data" not in st.session_state:
     st.session_state.data = []
 
 # =========================
-# LANGUAGE SYSTEM
+# LANGUAGE
 # =========================
 lang = st.sidebar.selectbox("Language / Език", ["Български", "English"])
 
@@ -25,33 +25,55 @@ def t(bg, en):
     return bg if lang == "Български" else en
 
 # =========================
-# CALM AESTHETIC STYLE 🌿
+# 🌿 SAFE CALM UI (FIXED CONTRAST)
 # =========================
 st.markdown("""
 <style>
 
-/* soft gradient background */
+/* background */
 .stApp {
-    background: linear-gradient(135deg, #e8f5f0 0%, #f4f7ff 50%, #eef9f2 100%);
+    background: linear-gradient(135deg, #eaf4f0 0%, #f3f6fb 50%, #eef6f1 100%);
 }
 
-/* glass-like cards */
+/* FIX TEXT VISIBILITY (IMPORTANT) */
+html, body, [class*="css"] {
+    color: #1f2d3d !important;
+}
+
+/* headings */
+h1, h2, h3 {
+    color: #1f2d3d !important;
+}
+
+/* normal text */
+p, span, label {
+    color: #2b3a4a !important;
+}
+
+/* metric cards */
 div[data-testid="stMetric"] {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255,255,255,0.85);
     border-radius: 16px;
     padding: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
 
-/* sidebar soft */
+/* sidebar */
 section[data-testid="stSidebar"] {
-    background: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.75);
 }
 
-/* text soft */
-h1, h2, h3 {
-    color: #2c3e50;
+/* buttons */
+.stButton > button {
+    border-radius: 10px;
+    border: none;
+    background: #2f6f5e;
+    color: white;
+    padding: 0.4rem 1rem;
+}
+
+.stButton > button:hover {
+    background: #245648;
 }
 
 </style>
@@ -75,25 +97,25 @@ departments = [
 # =========================
 emotion_responses = {
     "Good": [
-        "Днес си в стабилен и лек ритъм.",
-        "Енергията ти е подредена.",
+        "Днес си в стабилен ритъм.",
+        "Енергията ти е балансирана.",
         "Спокоен и продуктивен ден.",
-        "Балансът ти работи добре.",
-        "Добър поток на мисли и работа."
+        "Добър поток на работа.",
+        "Всичко е под контрол."
     ],
     "Neutral": [
         "Спокоен, равен ден.",
-        "Баланс без крайности.",
-        "Тих работен ритъм.",
-        "Стабилно състояние.",
-        "Нормален ден — и това е окей."
+        "Без крайности.",
+        "Стабилен ритъм.",
+        "Нормален работен ден.",
+        "Балансът е окей."
     ],
     "Bad": [
-        "Труден момент — но временен.",
-        "Дишай и забави темпото.",
-        "Почивката е правилният ход.",
-        "Не носи всичко сам.",
-        "Това ще премине."
+        "Труден момент — ще отмине.",
+        "Забави темпото.",
+        "Почивката е важна.",
+        "Не си сам.",
+        "Дишай спокойно."
     ]
 }
 
@@ -117,7 +139,7 @@ menu = st.sidebar.radio(
 st.markdown("""
 <div style='text-align:center; padding:10px 0 20px 0;'>
     <h1>Inner Compass</h1>
-    <p style='color:#5f6f81;'>AI HR & Wellbeing Intelligence Platform</p>
+    <p style='color:#4f5f6f;'>AI HR & Wellbeing Intelligence Platform</p>
 </div>
 <hr style='opacity:0.3'>
 """, unsafe_allow_html=True)
@@ -211,8 +233,8 @@ elif menu == t("AI анализ", "AI Insights"):
             ))
 
             st.write(t(
-                "Препоръка: повече почивки и по-ниско натоварване.",
-                "Recommendation: more breaks and reduced workload."
+                "Препоръка: намаляване на натоварването и повече почивки.",
+                "Recommendation: reduce workload and increase breaks."
             ))
 
         elif avg_energy < 5:
@@ -287,7 +309,7 @@ elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 - Work/rest balance  
 
 ## 🧠 Mental health
-- Single task focus  
+- Single-task focus  
 - Reduce notifications  
 
 ## 🌿 Recovery
