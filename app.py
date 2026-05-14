@@ -84,31 +84,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (CENTERED LOGO FIX - ONLY CHANGE HERE)
+# HEADER (FIXED + CENTERED + BIGGER LOGO)
 # =========================
-st.markdown(
-    """
-    <div style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    ">
-    """,
-    unsafe_allow_html=True
-)
+col1, col2, col3 = st.columns([1, 2, 1])
 
-st.image("logo.png", width=360)
+with col2:
+    st.image("logo.png", width=420)
 
-st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div style='text-align:center; margin-top:10px;'>
+            <p style='color:gray; font-size:14px;'>
+                AI HR & Wellbeing Intelligence Platform
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-st.markdown("""
-<div style='text-align:center;'>
-    <p style='color:gray;'>AI HR & Wellbeing Intelligence Platform</p>
-</div>
-<hr>
-""", unsafe_allow_html=True)
+st.markdown("<hr>", unsafe_allow_html=True)
 
 # =========================
 # SIDEBAR
