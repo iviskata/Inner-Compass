@@ -84,11 +84,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (LOGO INSTEAD OF TEXT)
+# HEADER (CENTERED LOGO FIX)
 # =========================
-st.markdown("<div style='text-align:center; padding-top:10px;'>", unsafe_allow_html=True)
-st.image("logo.png", width=180)   # ✅ LOGO HEADER
-st.markdown("</div>", unsafe_allow_html=True)
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("logo.png", width=180)
 
 st.markdown("""
 <div style='text-align:center;'>
@@ -157,7 +157,7 @@ if menu == t("Табло", "Dashboard"):
             st.line_chart([d["energy"] for d in data[-30:]])
 
 # =========================================================
-# CHECK-IN (UPDATED)
+# CHECK-IN
 # =========================================================
 elif menu == t("Въвеждане", "Check-in"):
 
@@ -170,9 +170,9 @@ elif menu == t("Въвеждане", "Check-in"):
     energy = st.slider(t("Енергия", "Energy"), 1, 10, 5)
     note = st.text_input(t("Бележка", "Note"))
 
-    # ✅ NEW: Management feedback
+    # ✅ FIXED LANGUAGE LABEL
     feedback = st.text_area(
-        t("Suggestions to Management", "Suggestions to Management")
+        t("Предложения към ръководството", "Suggestions to Management")
     )
 
     if st.button(t("Запази", "Save")):
@@ -184,7 +184,7 @@ elif menu == t("Въвеждане", "Check-in"):
             "mood": mood,
             "energy": energy,
             "note": note,
-            "feedback": feedback   # ✅ NEW FIELD
+            "feedback": feedback
         })
 
         st.success(t("Записано успешно", "Saved successfully"))
@@ -244,7 +244,7 @@ elif menu == t("AI анализ", "AI Insights"):
             ))
 
 # =========================================================
-# DATA (UPDATED TABLE)
+# DATA
 # =========================================================
 elif menu == t("Данни", "Data"):
 
