@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import datetime
 import random
+import pandas as pd   # ✅ ДОБАВЕНО (нужно за time-based charts)
 
 # =========================
 # CONFIG
@@ -141,8 +142,10 @@ if menu == t("Табло", "Dashboard"):
         def metric(title, value, emoji):
             st.markdown(f"""
             <div class="metric-card">
-                <div class="small-title">{emoji} {title}</div>
-                <div class="big-number">{value}</div>
+                <div style="font-size: 13px; color: gray;">{emoji} {title}</div>
+                <div style="font-size: 30px; font-weight: 700; margin-top: 8px;">
+                    {value}
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -175,15 +178,33 @@ if menu == t("Табло", "Dashboard"):
 
         st.subheader(t("Тенденции", "Trends"))
 
+        # =========================
+        # ✅ IMPROVED TIME-BASED CHARTS
+        # =========================
+
+        df = pd.DataFrame(data)
+        df["time"] = pd.to_datetime(df["time"])
+
         col1, col2 = st.columns(2)
 
         with col1:
             st.write(t("Седмица", "Weekly"))
-            st.area_chart([d["energy"] for d in data[-7:]])
+
+            weekly = df.tail(7).sort_values("time")
+            weekly_chart = weekly.set_index("time")[["energy"]]
+
+            st.line_chart(weekly_chart)
+            st.caption("Last 7 check-ins with timestamps")
 
         with col2:
             st.write(t("Месец", "Monthly"))
-            st.bar_chart([d["energy"] for d in data[-30:]])
+
+            monthly = df.copy()
+            monthly["date"] = monthly["time"].dt.date
+            monthly_grouped = monthly.groupby("date")["energy"].mean()
+
+            st.line_chart(monthly_grouped)
+            st.caption("Daily average energy trend")
 
 # =========================
 # CHECK-IN
