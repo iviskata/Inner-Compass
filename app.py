@@ -71,20 +71,23 @@ emotion_responses = {
 st.markdown("""
 <style>
 .block-container { padding-top: 2rem; }
+
 .metric-card {
-    background: #ffffff;
+    background: linear-gradient(135deg, #1f1f2e, #2b2b40);
     padding: 18px;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     text-align: center;
+    color: white;
 }
+
 .small-title { font-size: 13px; color: gray; }
-.big-number { font-size: 28px; font-weight: 600; }
+.big-number { font-size: 30px; font-weight: 700; margin-top: 8px; }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (FIXED + CENTERED + BIGGER LOGO)
+# HEADER
 # =========================
 col1, col2, col3 = st.columns([1, 2, 1])
 
@@ -118,9 +121,9 @@ menu = st.sidebar.radio(
     ]
 )
 
-# =========================================================
+# =========================
 # DASHBOARD
-# =========================================================
+# =========================
 if menu == t("Табло", "Dashboard"):
 
     st.title(t("HR Табло", "HR Dashboard"))
@@ -133,21 +136,40 @@ if menu == t("Табло", "Dashboard"):
     else:
         moods = [d["mood"] for d in data]
         energy = [d["energy"] for d in data]
+        avg = sum(energy) / len(energy)
+
+        def metric(title, value, emoji):
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="small-title">{emoji} {title}</div>
+                <div class="big-number">{value}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Entries</div><div class='big-number'>{len(data)}</div></div>", unsafe_allow_html=True)
+            metric("Total Check-ins", len(data), "📊")
 
         with col2:
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Good</div><div class='big-number'>{moods.count('Good')}</div></div>", unsafe_allow_html=True)
+            metric("Positive Mood", moods.count("Good"), "😊")
 
         with col3:
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Bad</div><div class='big-number'>{moods.count('Bad')}</div></div>", unsafe_allow_html=True)
+            metric("Attention Needed", moods.count("Bad"), "⚠️")
 
         with col4:
-            avg = sum(energy)/len(energy)
-            st.markdown(f"<div class='metric-card'><div class='small-title'>Energy</div><div class='big-number'>{avg:.1f}</div></div>", unsafe_allow_html=True)
+            metric("Team Energy", f"{avg:.1f}", "⚡")
+
+        st.write("---")
+
+        st.markdown("### Live Team Status")
+
+        if moods.count("Bad") / len(data) > 0.4:
+            st.error("⚠️ Increased stress detected in the team.")
+        elif avg < 5:
+            st.warning("🔋 Team energy levels are declining.")
+        else:
+            st.success("🟢 Team morale is stable today.")
 
         st.write("---")
 
@@ -157,15 +179,15 @@ if menu == t("Табло", "Dashboard"):
 
         with col1:
             st.write(t("Седмица", "Weekly"))
-            st.line_chart([d["energy"] for d in data[-7:]])
+            st.area_chart([d["energy"] for d in data[-7:]])
 
         with col2:
             st.write(t("Месец", "Monthly"))
-            st.line_chart([d["energy"] for d in data[-30:]])
+            st.bar_chart([d["energy"] for d in data[-30:]])
 
-# =========================================================
+# =========================
 # CHECK-IN
-# =========================================================
+# =========================
 elif menu == t("Въвеждане", "Check-in"):
 
     st.title(t("Дневно въвеждане", "Daily Check-in"))
@@ -196,9 +218,9 @@ elif menu == t("Въвеждане", "Check-in"):
         st.success(t("Записано успешно", "Saved successfully"))
         st.info(random.choice(emotion_responses[mood]))
 
-# =========================================================
+# =========================
 # AI INSIGHTS
-# =========================================================
+# =========================
 elif menu == t("AI анализ", "AI Insights"):
 
     st.title("AI HR Intelligence")
@@ -249,9 +271,9 @@ elif menu == t("AI анализ", "AI Insights"):
                 "Continue current approach."
             ))
 
-# =========================================================
+# =========================
 # DATA
-# =========================================================
+# =========================
 elif menu == t("Данни", "Data"):
 
     st.title(t("HR данни", "HR Data"))
@@ -261,9 +283,9 @@ elif menu == t("Данни", "Data"):
     else:
         st.dataframe(st.session_state.data, use_container_width=True)
 
-# =========================================================
+# =========================
 # WELLBEING
-# =========================================================
+# =========================
 elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
     st.title(t("Баланс работа и ум", "Work & Mind Balance"))
