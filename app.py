@@ -7,7 +7,7 @@ import random
 # =========================
 st.set_page_config(
     page_title="Inner Compass — AI Wellbeing & HR Intelligence",
-    page_icon="logo.png",   # ✅ FAVICON
+    page_icon="logo.png.png",   # ✅ FAVICON
     layout="wide"
 )
 
