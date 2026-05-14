@@ -7,6 +7,7 @@ import random
 # =========================
 st.set_page_config(
     page_title="Inner Compass — AI Wellbeing & HR Intelligence",
+    page_icon="logo.png",   # ✅ FAVICON
     layout="wide"
 )
 
@@ -65,13 +66,11 @@ emotion_responses = {
 }
 
 # =========================
-# UI STYLE (premium feel)
+# STYLE
 # =========================
 st.markdown("""
 <style>
-.block-container {
-    padding-top: 2rem;
-}
+.block-container { padding-top: 2rem; }
 .metric-card {
     background: #ffffff;
     padding: 18px;
@@ -79,23 +78,20 @@ st.markdown("""
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     text-align: center;
 }
-.small-title {
-    font-size: 13px;
-    color: gray;
-}
-.big-number {
-    font-size: 28px;
-    font-weight: 600;
-}
+.small-title { font-size: 13px; color: gray; }
+.big-number { font-size: 28px; font-weight: 600; }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (PREMIUM)
+# HEADER (LOGO INSTEAD OF TEXT)
 # =========================
+st.markdown("<div style='text-align:center; padding-top:10px;'>", unsafe_allow_html=True)
+st.image("logo.png", width=180)   # ✅ LOGO HEADER
+st.markdown("</div>", unsafe_allow_html=True)
+
 st.markdown("""
-<div style='text-align:center; padding:20px 0;'>
-    <h1>Inner Compass</h1>
+<div style='text-align:center;'>
     <p style='color:gray;'>AI HR & Wellbeing Intelligence Platform</p>
 </div>
 <hr>
@@ -116,7 +112,7 @@ menu = st.sidebar.radio(
 )
 
 # =========================================================
-# DASHBOARD (CARD STYLE)
+# DASHBOARD
 # =========================================================
 if menu == t("Табло", "Dashboard"):
 
@@ -128,7 +124,6 @@ if menu == t("Табло", "Dashboard"):
         st.info(t("Няма данни", "No data yet"))
 
     else:
-
         moods = [d["mood"] for d in data]
         energy = [d["energy"] for d in data]
 
@@ -162,7 +157,7 @@ if menu == t("Табло", "Dashboard"):
             st.line_chart([d["energy"] for d in data[-30:]])
 
 # =========================================================
-# CHECK-IN
+# CHECK-IN (UPDATED)
 # =========================================================
 elif menu == t("Въвеждане", "Check-in"):
 
@@ -175,6 +170,11 @@ elif menu == t("Въвеждане", "Check-in"):
     energy = st.slider(t("Енергия", "Energy"), 1, 10, 5)
     note = st.text_input(t("Бележка", "Note"))
 
+    # ✅ NEW: Management feedback
+    feedback = st.text_area(
+        t("Suggestions to Management", "Suggestions to Management")
+    )
+
     if st.button(t("Запази", "Save")):
 
         st.session_state.data.append({
@@ -183,14 +183,15 @@ elif menu == t("Въвеждане", "Check-in"):
             "department": department,
             "mood": mood,
             "energy": energy,
-            "note": note
+            "note": note,
+            "feedback": feedback   # ✅ NEW FIELD
         })
 
         st.success(t("Записано успешно", "Saved successfully"))
         st.info(random.choice(emotion_responses[mood]))
 
 # =========================================================
-# AI INSIGHTS (UNCHANGED LOGIC, CLEAN UI)
+# AI INSIGHTS
 # =========================================================
 elif menu == t("AI анализ", "AI Insights"):
 
@@ -243,7 +244,7 @@ elif menu == t("AI анализ", "AI Insights"):
             ))
 
 # =========================================================
-# DATA
+# DATA (UPDATED TABLE)
 # =========================================================
 elif menu == t("Данни", "Data"):
 
@@ -255,7 +256,7 @@ elif menu == t("Данни", "Data"):
         st.dataframe(st.session_state.data, use_container_width=True)
 
 # =========================================================
-# WELLBEING (PREMIUM RESTORED)
+# WELLBEING
 # =========================================================
 elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 
