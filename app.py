@@ -84,11 +84,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER (CENTERED LOGO FIX)
+# HEADER (CENTERED LOGO FIX - ONLY CHANGE HERE)
 # =========================
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("logo.png", width=180)
+st.markdown(
+    """
+    <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    ">
+    """,
+    unsafe_allow_html=True
+)
+
+st.image("logo.png", width=360)
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("""
 <div style='text-align:center;'>
@@ -170,7 +183,6 @@ elif menu == t("Въвеждане", "Check-in"):
     energy = st.slider(t("Енергия", "Energy"), 1, 10, 5)
     note = st.text_input(t("Бележка", "Note"))
 
-    # ✅ FIXED LANGUAGE LABEL
     feedback = st.text_area(
         t("Предложения към ръководството", "Suggestions to Management")
     )
