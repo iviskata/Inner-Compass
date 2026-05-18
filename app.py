@@ -44,6 +44,20 @@ departments = [
 ]
 
 # =========================
+# MONTHLY CHALLENGES
+# =========================
+monthly_challenges = [
+    t("Movement & Energy Challenge", "Movement & Energy Challenge"),
+    t("Stretch & Recover Challenge", "Stretch & Recover Challenge"),
+    t("Mind & Motion Challenge", "Mind & Motion Challenge"),
+    t("Hydration & Balance Challenge", "Hydration & Balance Challenge")
+]
+
+active_challenge = monthly_challenges[
+    datetime.now().month % len(monthly_challenges)
+]
+
+# =========================
 # EMOTIONAL ENGINE
 # =========================
 emotion_responses = {
@@ -163,7 +177,7 @@ if menu == t("Табло", "Dashboard"):
             </div>
             """, unsafe_allow_html=True)
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
             metric("Total Check-ins", len(data), "📊")
@@ -177,14 +191,39 @@ if menu == t("Табло", "Dashboard"):
         with col4:
             metric("Team Energy", f"{avg:.1f}", "⚡")
 
+        with col5:
+
+            participation = 0
+
+            if len(st.session_state.challenge_data) > 0:
+                unique_users = len(
+                    set([
+                        x["employee"]
+                        for x in st.session_state.challenge_data
+                    ])
+                )
+
+                participation = int(
+                    (unique_users / len(employees)) * 100
+                )
+
+            metric(
+                t("Уелнес участие", "Wellness Participation"),
+                f"{participation}%",
+                "🏆"
+            )
+
         st.write("---")
 
         # ✅ ACTIVE CHALLENGE PREVIEW
-        st.markdown("""
+        st.markdown(f"""
         <div class="challenge-card">
-            <h3>🏆 Active Monthly Challenge</h3>
-            <p>Movement & Energy Challenge</p>
-            <p>Employees collect points through steps, movement and healthy routines.</p>
+            <h3>🏆 {t("Активно месечно предизвикателство", "Active Monthly Challenge")}</h3>
+            <p>{active_challenge}</p>
+            <p>{t(
+                "Служителите събират точки чрез движение и здравословни навици.",
+                "Employees collect points through movement and healthy habits."
+            )}</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -287,6 +326,11 @@ elif menu == t("AI анализ", "AI Insights"):
                 "Recommendation: reduce workload and increase breaks."
             ))
 
+            st.info(t(
+                "🤖 AI предложение: Recovery & Movement Challenge",
+                "🤖 AI Suggestion: Recovery & Movement Challenge"
+            ))
+
         elif avg_energy < 5:
 
             st.warning(t(
@@ -299,6 +343,11 @@ elif menu == t("AI анализ", "AI Insights"):
                 "Recommendation: lighter workload."
             ))
 
+            st.info(t(
+                "🤖 AI предложение: Mind & Motion Challenge",
+                "🤖 AI Suggestion: Mind & Motion Challenge"
+            ))
+
         else:
 
             st.success(t(
@@ -309,6 +358,11 @@ elif menu == t("AI анализ", "AI Insights"):
             st.info(t(
                 "Продължете текущия подход.",
                 "Continue current approach."
+            ))
+
+            st.info(t(
+                "🤖 AI предложение: Team Energy Challenge",
+                "🤖 AI Suggestion: Team Energy Challenge"
             ))
 
 # =========================
@@ -385,12 +439,43 @@ elif menu == t("Уелнес предизвикателства", "Wellbeing Cha
         "Wellbeing Challenges"
     ))
 
-    st.markdown("""
+    st.markdown(f"""
     <div class="challenge-card">
-        <h2>🏆 Movement & Energy Challenge</h2>
-        <p>Track movement, healthy habits and team wellbeing engagement.</p>
+        <h2>🏆 {active_challenge}</h2>
+        <p>{t(
+            "Проследяване на движение, активност и уелнес навици.",
+            "Track movement, activity and healthy wellbeing habits."
+        )}</p>
     </div>
     """, unsafe_allow_html=True)
+
+    # =========================
+    # TEAM GOAL
+    # =========================
+    team_goal = 500000
+
+    total_steps = 0
+
+    if len(st.session_state.challenge_data) > 0:
+        total_steps = sum(
+            item["steps"]
+            for item in st.session_state.challenge_data
+        )
+
+    progress = min(total_steps / team_goal, 1.0)
+
+    st.subheader(t("Отборна цел", "Team Goal"))
+
+    st.progress(progress)
+
+    st.caption(
+        t(
+            f"{total_steps:,} / {team_goal:,} крачки",
+            f"{total_steps:,} / {team_goal:,} steps"
+        )
+    )
+
+    st.write("---")
 
     employee = st.selectbox(
         t("Служител", "Employee"),
@@ -442,11 +527,39 @@ elif menu == t("Уелнес предизвикателства", "Wellbeing Cha
             )
         )
 
+        # ✅ HUMAN FEEDBACK
+        if total_score >= 120:
+
+            st.success(t(
+                "🔥 Страхотна последователност днес.",
+                "🔥 Amazing consistency today."
+            ))
+
+        elif total_score >= 60:
+
+            st.info(t(
+                "🌿 Всяка малка стъпка подкрепя дългосрочното благополучие.",
+                "🌿 Every small step supports long-term wellbeing."
+            ))
+
+        else:
+
+            st.warning(t(
+                "💙 Дори кратките моменти на движение имат значение.",
+                "💙 Even short movement breaks matter."
+            ))
+
+    # =========================
+    # WELLBEING PROGRESS
+    # =========================
     if len(st.session_state.challenge_data) > 0:
 
         st.write("---")
 
-        st.subheader(t("Класация", "Leaderboard"))
+        st.subheader(t(
+            "Уелнес прогрес",
+            "Wellbeing Progress"
+        ))
 
         challenge_df = pd.DataFrame(st.session_state.challenge_data)
 
@@ -456,7 +569,22 @@ elif menu == t("Уелнес предизвикателства", "Wellbeing Cha
             .sort_values("score", ascending=False)
         )
 
-        st.dataframe(leaderboard, use_container_width=True)
+        medals = ["🥇", "🥈", "🥉"]
+
+        for index, (employee_name, row) in enumerate(leaderboard.iterrows()):
+
+            medal = medals[index] if index < 3 else "🏅"
+
+            st.markdown(f"""
+            <div class="metric-card" style="margin-bottom:15px;">
+                <div style="font-size:20px;">
+                    {medal} {employee_name}
+                </div>
+                <div style="font-size:32px; margin-top:10px;">
+                    {int(row["score"])} pts
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
         winner = leaderboard.index[0]
 
@@ -473,3 +601,23 @@ elif menu == t("Уелнес предизвикателства", "Wellbeing Cha
                 "The goal is building a healthier and more active work environment."
             )
         )
+
+        # =========================
+        # WELLBEING INSIGHTS
+        # =========================
+        st.write("---")
+
+        st.subheader(t(
+            "Уелнес прозрения",
+            "Wellbeing Insights"
+        ))
+
+        st.info(t(
+            "📈 Екипите с по-висока физическа активност показват по-добри нива на енергия и настроение.",
+            "📈 Teams with higher movement engagement show stronger mood and energy trends."
+        ))
+
+        st.info(t(
+            "🌿 Редовните почивки за раздвижване подпомагат по-балансиран работен ритъм.",
+            "🌿 Regular stretch breaks support a more balanced work rhythm."
+        ))
