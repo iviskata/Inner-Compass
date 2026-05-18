@@ -1,14 +1,14 @@
 import streamlit as st
 from datetime import datetime
 import random
-import pandas as pd   # ✅ ДОБАВЕНО (нужно за time-based charts)
+import pandas as pd
 
 # =========================
 # CONFIG
 # =========================
 st.set_page_config(
     page_title="Inner Compass — AI Wellbeing & HR Intelligence",
-    page_icon="logo.png",   # ✅ FAVICON
+    page_icon="logo.png",
     layout="wide"
 )
 
@@ -17,6 +17,10 @@ st.set_page_config(
 # =========================
 if "data" not in st.session_state:
     st.session_state.data = []
+
+# ✅ NEW STATE FOR CHALLENGES
+if "challenge_data" not in st.session_state:
+    st.session_state.challenge_data = []
 
 # =========================
 # LANGUAGE SYSTEM
@@ -84,6 +88,15 @@ st.markdown("""
 
 .small-title { font-size: 13px; color: gray; }
 .big-number { font-size: 30px; font-weight: 700; margin-top: 8px; }
+
+.challenge-card {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    padding: 22px;
+    border-radius: 18px;
+    color: white;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -118,7 +131,8 @@ menu = st.sidebar.radio(
         t("Въвеждане", "Check-in"),
         t("AI анализ", "AI Insights"),
         t("Данни", "Data"),
-        t("Work & Mind Balance", "Work & Mind Balance")
+        t("Work & Mind Balance", "Work & Mind Balance"),
+        t("Уелнес предизвикателства", "Wellbeing Challenges")
     ]
 )
 
@@ -165,6 +179,15 @@ if menu == t("Табло", "Dashboard"):
 
         st.write("---")
 
+        # ✅ ACTIVE CHALLENGE PREVIEW
+        st.markdown("""
+        <div class="challenge-card">
+            <h3>🏆 Active Monthly Challenge</h3>
+            <p>Movement & Energy Challenge</p>
+            <p>Employees collect points through steps, movement and healthy routines.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
         st.markdown("### Live Team Status")
 
         if moods.count("Bad") / len(data) > 0.4:
@@ -177,10 +200,6 @@ if menu == t("Табло", "Dashboard"):
         st.write("---")
 
         st.subheader(t("Тенденции", "Trends"))
-
-        # =========================
-        # ✅ IMPROVED TIME-BASED CHARTS
-        # =========================
 
         df = pd.DataFrame(data)
         df["time"] = pd.to_datetime(df["time"])
@@ -355,3 +374,102 @@ elif menu == t("Work & Mind Balance", "Work & Mind Balance"):
 - 7–9h sleep  
 - Rest after work  
 """))
+
+# =========================
+# WELLBEING CHALLENGES
+# =========================
+elif menu == t("Уелнес предизвикателства", "Wellbeing Challenges"):
+
+    st.title(t(
+        "Уелнес предизвикателства",
+        "Wellbeing Challenges"
+    ))
+
+    st.markdown("""
+    <div class="challenge-card">
+        <h2>🏆 Movement & Energy Challenge</h2>
+        <p>Track movement, healthy habits and team wellbeing engagement.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    employee = st.selectbox(
+        t("Служител", "Employee"),
+        employees,
+        key="challenge_employee"
+    )
+
+    steps = st.number_input(
+        t("Днешни крачки", "Today's Steps"),
+        min_value=0,
+        max_value=50000,
+        step=500
+    )
+
+    active_minutes = st.slider(
+        t("Активни минути", "Active Minutes"),
+        0,
+        180,
+        30
+    )
+
+    stretch_breaks = st.slider(
+        t("Почивки за раздвижване", "Stretch Breaks"),
+        0,
+        20,
+        3
+    )
+
+    if st.button(t("Запази активност", "Save Activity")):
+
+        total_score = (
+            steps // 1000 +
+            active_minutes +
+            (stretch_breaks * 5)
+        )
+
+        st.session_state.challenge_data.append({
+            "employee": employee,
+            "steps": steps,
+            "active_minutes": active_minutes,
+            "stretch_breaks": stretch_breaks,
+            "score": total_score
+        })
+
+        st.success(
+            t(
+                "Активността е запазена успешно.",
+                "Activity saved successfully."
+            )
+        )
+
+    if len(st.session_state.challenge_data) > 0:
+
+        st.write("---")
+
+        st.subheader(t("Класация", "Leaderboard"))
+
+        challenge_df = pd.DataFrame(st.session_state.challenge_data)
+
+        leaderboard = (
+            challenge_df.groupby("employee")[["score"]]
+            .sum()
+            .sort_values("score", ascending=False)
+        )
+
+        st.dataframe(leaderboard, use_container_width=True)
+
+        winner = leaderboard.index[0]
+
+        st.success(
+            t(
+                f"🏆 Водещ участник: {winner}",
+                f"🏆 Current Leader: {winner}"
+            )
+        )
+
+        st.info(
+            t(
+                "Целта е изграждане на по-здравословна и активна работна среда.",
+                "The goal is building a healthier and more active work environment."
+            )
+        )
